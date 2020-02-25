@@ -1,0 +1,31 @@
+body, html{
+    height: 100%;
+}
+
+$numberOfBoxes: 3;
+
+.box{
+    display: flex;
+    width: 60px;
+    height: 60px;
+    justify-content: center;
+    align-items: center;
+}
+
+@for $i from 1 through $numberOfBoxes {
+    .box:nth-of-type(#{$i}) {
+        $actualBackgroundColor: grayscale($color: rgb(34, 16, 16) * $i); 
+        background-color: $actualBackgroundColor;
+        color: invert($actualBackgroundColor);
+    }
+}
+
+#outer {
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    align-items: center;
+}
