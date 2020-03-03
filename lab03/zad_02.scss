@@ -1,0 +1,42 @@
+$numberOfFields: 30;
+
+.container {
+    display: grid;
+    grid-template-columns: repeat(5, 170px);
+  grid-template-rows: 30px repeat(5, 30px) 30px;
+  grid-auto-flow: row;
+  column-gap: 5px;
+
+  .item {
+    background-color: rgb(252, 229, 101);
+        border: 1px solid black;
+        margin: 3px;
+        text-align: center;
+        color: white;    
+}
+
+
+.item9 {
+    grid-column-start: span 2;
+    background-color: pink;
+}
+
+.item11 {
+    grid-row-start: span 4;
+    background-color: Grey;
+}
+
+.item16 {
+    grid-row-start: span 2;
+    grid-column-start: span 2;
+    background-color: blue;
+}
+
+
+.item29 {
+    grid-column-start: span 4;
+    background-color: brown;
+}
+
+
+}
