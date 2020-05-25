@@ -1,2 +1,5 @@
 *.css
 *.map
+
+/client
+node_modules

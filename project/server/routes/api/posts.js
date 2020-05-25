@@ -1,45 +1,43 @@
-const express = require('express');
-const mongodb = require('mongodb');
+// const express = require("express");
+// const mongodb = require("mongodb");
 
-const Product = require('../../models/product.model');
+// // const Product = require("../../models/");
 
-let prod = new Product({})
+// // const prod = new Product({});
 
-const router = express.Router();
+// const router = express.Router();
 
-// Get Posts
-router.get('/', async (req, res) => {
-    const posts = await loadPostsCollection();
-    res.send(await posts.find({}).toArray());
-});
+// // Get Posts
+// router.get("/", async (req, res) => {
+//     const posts = await loadPostsCollection();
+//     res.send(await posts.find({}).toArray());
+// });
 
+// // Add post
 
-// Add post
+// router.post("/", async (req, res) => {
+//     const posts = await loadPostsCollection();
+//     await posts.insertOne({
+//         text: req.body.text,
+//         createdAt: new Date()
+//     });
+//     res.status(201).send();
+// });
 
-router.post('/', async(req, res) => {
-    const posts = await loadPostsCollection();
-    await posts.insertOne({
-        text: req.body.text,
-        createdAt: new Date()
-    });
-    res.status(201).send();
-});
+// // Delete Post
 
-// Delete Post
+// router.delete("/:id", async (req, res) => {
+//     const posts = await loadPostsCollection();
+//     await posts.deleteOne({ _id: new mongodb.ObjectID(req.params.id) });
+//     res.status(200).send();
+// });
 
-router.delete('/:id', async (req, res) => {
-    const posts = await loadPostsCollection();
-    await posts.deleteOne({_id: new mongodb.ObjectID(req.params.id)});
-    res.status(200).send();
-});
+// async function loadPostsCollection () {
+//     const client = await mongodb.MongoClient.connect("mongodb+srv://admin:admin@cluster-3rxus.mongodb.net/test?retryWrites=true&w=majority", {
+//         useNewUrlParser: true
+//     });
 
-async function loadPostsCollection() {
-    const client = await mongodb.MongoClient.connect
-    ('mongodb+srv://admin:admin@cluster-3rxus.mongodb.net/test?retryWrites=true&w=majority', {
-        useNewUrlParser: true
-    });
+//     return client.db("test").collection("posts");
+// }
 
-    return client.db('test').collection('posts');
-}
-
-module.exports = router;
+// module.exports = router;
