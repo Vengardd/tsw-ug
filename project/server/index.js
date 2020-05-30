@@ -1,11 +1,15 @@
+const mongoose = require("./mongoose");
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const passport = require("./passport");
 const User = require("./models/user");
 const bcrypt = require("./bcrypt/bcrypt");
+const auctionController = require("./controller/AuctionController");
 
 const app = express();
+const http = require("http").Server(app);
+var io = require("socket.io")(http);
 
 const port = process.env.PORT || 5000;
 
@@ -17,7 +21,7 @@ app.listen(port, () => {
     console.log(`Running on port ${port}`);
 });
 
-const router = express.Router();
+// const router = express.Router();
 
 // const app = express();
 
@@ -167,5 +171,22 @@ app
         res.json({ test: "test" }).status(200).send();
     })
     .all(rejectMethod);
+
+// app
+//     .get("/api/auction/all", (req, res) => {
+//         res.json([{ id: 1, title: "firstTitle" }, { id: 2, title: "secondTitle" }]);
+//     });
+app
+    .get("/api/auction/all", auctionController.getAllAuctions);
+// app.crea("/api/auction");
+
+io.on("connection", () => {
+    console.log("a user is connected");
+});
+
+app.get("/messages", (req, res) => {
+    io.emit("message", "asd");
+    res.sendStatus(200);
+});
 
 // module.exports = router;

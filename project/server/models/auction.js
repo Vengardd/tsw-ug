@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
+console.log("Before Auction Schema");
+
 const AuctionSchema = new Schema({
     title: { type: String, required: true },
     description: { type: String },
@@ -12,5 +14,7 @@ const AuctionSchema = new Schema({
     actualPrice: { type: Number, required: true }
 });
 
+const Auction = mongoose.model("Auction", AuctionSchema);
+
 // Export the model
-module.exports = mongoose.model("Auction", AuctionSchema);
+module.exports = Auction;

@@ -26,7 +26,7 @@
 
 <script>
 
-import PostService from "../PostService";
+import PostService from "../service/PostService";
 
 export default {
     name: "PostComponent",
