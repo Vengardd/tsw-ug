@@ -10,6 +10,7 @@ const messageController = require("./controller/MessageController");
 const userController = require("./controller/UserController");
 const axios = require("axios");
 const mongoose = require("mongoose");
+const mongos = require("./mongoose");
 
 // https.createServer(options, function (req, res) {
 //     res.writeHead(200);
@@ -19,11 +20,15 @@ const mongoose = require("mongoose");
 const app = express();
 app.use(bodyParser.json());
 app.use(cors({ credentials: true, origin: "http://localhost:8080" }));
-const server = require("./https")(app);
+// const server = require("./https")(app);
 const port = process.env.PORT || 5000;
-server.listen(port, () => {
-    console.log("https");
+app.listen(port, () => {
+    console.log(`Running on port ${port}`);
 });
+
+// server.listen(port, () => {
+//     console.log("https");
+// });
 
 app.use(passport.initialize());
 
@@ -46,14 +51,16 @@ axios.config = axiosConfig;
 //     res.send("Welcome to my Nodemon API!");
 // });
 
+// const routes = require("./routes/AuctionRouter");
+// app.use("/api", routes);
+
 app
     .get("/", (req, res) => {
         res.send("test");
     });
 app
-    .get("/api/auction/all", auctionController.getAllAuctions);
-app
     .get("/api/message/all", messageController.getAllMessagesByClientUsername);
+app.get("/api/auction", auctionController.getAuctionById);
 
 const users = [];
 let messages = [];

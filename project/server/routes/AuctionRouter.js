@@ -1,5 +1,10 @@
-const express = require("express");
-var app = express();
-const auctionController = require("../controller/AuctionController");
+// const app = require("express");
+// const auctionController = require("../controller/AuctionController");
 
-app.get("/api/auction/all", auctionController.getAllAuctions);
+
+// // router.route("/auction")
+// //     .get(auctionController.getAuctionById)
+// //     .post(auctionController.addAuction)
+// //     .patch(auctionController.actualiseAuction);
+
+// // module.exports = router;
