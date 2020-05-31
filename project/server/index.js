@@ -25,6 +25,8 @@ server.listen(port, () => {
     console.log("https");
 });
 
+app.use(passport.initialize());
+
 const http = require("http").Server(app);
 var io = require("socket.io")(http, { origins: "*:*" });
 io.set("origins", "localhost:8080");
