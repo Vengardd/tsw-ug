@@ -6,7 +6,7 @@ exports.getAllAuctions = async (req, res) => {
     return allAuctions;
 };
 
-exports.getAuctionById = async (req, res) => {
-    const id = req.query.id;
-    return Auction.findById(id);
-};
+// exports.getAuctionById = async (req, res) => {
+//     const id = req.query.id;
+//     return Auction.findById(id);
+// };

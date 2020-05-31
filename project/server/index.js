@@ -1,192 +1,112 @@
-const mongoose = require("./mongoose");
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const passport = require("./passport");
 const User = require("./models/user");
+const Message = require("./models/message");
 const bcrypt = require("./bcrypt/bcrypt");
 const auctionController = require("./controller/AuctionController");
+const messageController = require("./controller/MessageController");
+const userController = require("./controller/UserController");
+const axios = require("axios");
+const mongoose = require("mongoose");
+
+// https.createServer(options, function (req, res) {
+//     res.writeHead(200);
+//     res.end("hello world\n");
+// }).listen(5000);
 
 const app = express();
-const http = require("http").Server(app);
-var io = require("socket.io")(http);
-
+app.use(bodyParser.json());
+app.use(cors({ credentials: true, origin: "http://localhost:8080" }));
+const server = require("./https")(app);
 const port = process.env.PORT || 5000;
+server.listen(port, () => {
+    console.log("https");
+});
+
+const http = require("http").Server(app);
+var io = require("socket.io")(http, { origins: "*:*" });
+io.set("origins", "localhost:8080");
+
+const axiosConfig = {
+    withCredentials: true,
+    headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "http://localhost:8080/",
+        "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE"
+    }
+};
+
+axios.config = axiosConfig;
 
 // app.get("/", (req, res) => {
 //     res.send("Welcome to my Nodemon API!");
 // });
 
-app.listen(port, () => {
-    console.log(`Running on port ${port}`);
-});
-
-// const router = express.Router();
-
-// const app = express();
-
-// Middleware
-app.use(bodyParser.json());
-app.use(cors());
-
-// const posts = require("./routes/api/posts");
-
-// app.use("/api/posts", posts);
-
-// Middleware
-
-app.get("/", (req, res) => {
-    res.send("test");
-});
-
-const midAuth = (req, res, next) => {
-    if (req.isAuthenticated()) {
-        return next();
-    } else {
-        res.status(403).json({
-            message: "not authenticated"
-        });
-    }
-};
-
-const rejectMethod = (_req, res, _next) => {
-    res.sendStatus(405);
-};
-
 app
-    .route("/")
-    .get(midAuth, (req, res) => {
-        res.json({
-            isAuthenticated: req.isAuthenticated(),
-            user: req.user
-        });
-    })
-    .all(rejectMethod);
-
-app
-    .route("/api/login")
-    .post(passport.authenticate("local"), async (req, res) => {
-        res.status(200).json({
-            message: "success"
-        });
-    })
-    .all(rejectMethod);
-
-app
-    .route("/api/logout")
-    .get((req, res) => {
-        req.logout();
-        res.redirect("/");
-    })
-    .all(rejectMethod);
-
-app
-    .route("/api/register")
-    .post(async (req, res) => {
-        try {
-            const passwordHash = bcrypt.hash(req.body.password);
-            const user = new User({
-                username: req.body.username,
-                password: passwordHash,
-                email: req.body.email
-            });
-            const doc = await user.save();
-            res.json(doc);
-        } catch (err) {
-            if (!req.body.password) {
-                res.status(422).json({
-                    password: "Error – password must not be empty!"
-                });
-            } else {
-                res.status(422).json(User.processErrors(err));
-            }
-        }
-    })
-    .all(rejectMethod);
-
-// router
-//     .route("/api/offer")
-//     .get(async (req, res) => {
-//         try {
-//             var arr = [];
-//             for await (const doc of Offer.find()) {
-//                 arr.push(doc);
-//             }
-//             console.log(arr);
-//             return res.send(arr);
-//         } catch (err) {
-//             return res.status(400).json({
-//                 error: err.message
-//             });
-//         }
-//     })
-//     .post(midAuth, async (req, res) => {
-//         try {
-//             console.log("Is ok");
-//             const user = req.user;
-//             const body = req.body;
-//             const offer = new Offer({
-//                 title: body.title,
-//                 description: body.description,
-//                 imageUrl: body.imageUrl,
-//                 price: body.price,
-//                 type: body.type,
-//                 owner: {
-//                     id: user.id,
-//                     username: user.username
-//                 },
-//                 buyer: null,
-//                 duration: body.duration,
-//                 isFinisherd: false
-//             });
-//             console.log(offer.type);
-//             console.log(offer.owner.id);
-//             console.log("Super");
-//             const doc = await offer.save();
-//             res.json(doc);
-//         } catch (err) {
-//             console.log(err);
-//             res.status(422).json(Offer.processErrors(err));
-//         }
-//     })
-//     .all(rejectMethod);
-
-app
-    .route("/api/user")
-    .get(midAuth, (req, res) => {
-        if (req.isAuthenticated) {
-            res.json({
-                user: req.user
-            });
-        } else {
-            res.json({
-                user: null
-            });
-        }
-    })
-    .all(rejectMethod);
-
-app
-    .get("/test", (req, res) => {
-        res.json({ test: "test" }).status(200).send();
-    })
-    .all(rejectMethod);
-
-// app
-//     .get("/api/auction/all", (req, res) => {
-//         res.json([{ id: 1, title: "firstTitle" }, { id: 2, title: "secondTitle" }]);
-//     });
+    .get("/", (req, res) => {
+        res.send("test");
+    });
 app
     .get("/api/auction/all", auctionController.getAllAuctions);
-// app.crea("/api/auction");
+app
+    .get("/api/message/all", messageController.getAllMessagesByClientUsername);
 
-io.on("connection", () => {
-    console.log("a user is connected");
+const users = [];
+let messages = [];
+
+const ChatSchema = mongoose.Schema({
+    username: String,
+    msg: String
 });
 
-app.get("/messages", (req, res) => {
-    io.emit("message", "asd");
-    res.sendStatus(200);
+const ChatModel = mongoose.model("chat", ChatSchema);
+
+ChatModel.find((err, result) => {
+    if (err) throw err;
+
+    messages = result;
 });
 
-// module.exports = router;
+io.on("connection", socket => {
+    socket.on("example", function (data) {
+        io.emit("example", data);
+    });
+
+    socket.emit("loggedIn", {
+        users: users.map(s => s.username),
+        messages: messages
+    });
+
+    socket.on("newuser", username => {
+        console.log(`${username} has arrived at the party.`);
+        socket.username = username;
+
+        users.push(socket);
+
+        io.emit("userOnline", socket.username);
+    });
+
+    socket.on("msg", msg => {
+        const message = new ChatModel({
+            username: socket.username,
+            msg: msg
+        });
+
+        message.save((err, result) => {
+            if (err) throw err;
+
+            messages.push(result);
+
+            io.emit("msg", result);
+        });
+    });
+
+    // Disconnect
+    socket.on("disconnect", () => {
+        console.log(`${socket.username} has left the party.`);
+        io.emit("userLeft", socket.username);
+        users.splice(users.indexOf(socket), 1);
+    });
+});
