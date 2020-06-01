@@ -3,9 +3,9 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const passport = require("./passport");
 const User = require("./models/user");
-const Message = require("./models/message");
 const auctionController = require("./controller/AuctionController");
 const messageController = require("./controller/MessageController");
+const AuctionProcessController = require("./controller/AuctionProcessController");
 const userController = require("./controller/UserController");
 const axios = require("axios");
 const mongoose = require("mongoose");
@@ -82,6 +82,14 @@ const rejectMethod = (_req, res, _next) => {
     res.sendStatus(405);
 };
 
+const processErrors = (err) => {
+    const msg = {};
+    for (const key in err.errors) {
+        msg[key] = err.errors[key].message;
+    }
+    return msg;
+};
+
 app
     .get("/users", passport.authenticate("basic", {
         session: false
@@ -132,7 +140,10 @@ app
         try {
             const user = new User({
                 username: req.body.username,
-                password: req.body.password
+                password: req.body.password,
+                name: req.body.name,
+                surname: req.body.surname,
+                email: req.body.email
             });
             const doc = await user.save();
             res.json(doc);
@@ -141,6 +152,29 @@ app
         }
     })
     .all(rejectMethod);
+
+app
+    .post("/start", isAuth, auctionController.startAuction)
+    .all(rejectMethod);
+
+app
+    .get("/auction", auctionController.getAuctionById)
+    .post("/auction", isAuth, auctionController.addAuction)
+    .patch("/auction", isAuth, auctionController.actualiseAuction)
+    .delete("/auction", isAuth, auctionController.deleteAuction)
+    .all(rejectMethod);
+
+app
+    .get("/auctions", auctionController.getAllAuctions)
+    .all(rejectMethod);
+
+app
+    .get("/bids", isAuth, AuctionProcessController.getAuctionProcessesForUser)
+    .all(rejectMethod);
+
+// app
+//     .get("/history", isAuth, messageController.getHistoryForUser)
+//     .all(rejectMethod);
 
 io.use(passportSocketIo.authorize({
     cookieParser: cookieParser, // the same middleware you registrer in express
