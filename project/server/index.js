@@ -4,13 +4,16 @@ const cors = require("cors");
 const passport = require("./passport");
 const User = require("./models/user");
 const Message = require("./models/message");
-const bcrypt = require("./bcrypt/bcrypt");
 const auctionController = require("./controller/AuctionController");
 const messageController = require("./controller/MessageController");
 const userController = require("./controller/UserController");
 const axios = require("axios");
 const mongoose = require("mongoose");
 const mongos = require("./mongoose");
+const session = require("express-session");
+const MongoStore = require("connect-mongo")(session);
+const passportSocketIo = require("passport.socketio");
+const cookieParser = require("cookie-parser");
 
 // https.createServer(options, function (req, res) {
 //     res.writeHead(200);
@@ -19,12 +22,14 @@ const mongos = require("./mongoose");
 
 const app = express();
 app.use(bodyParser.json());
+app.use(cookieParser);
 app.use(cors({ credentials: true, origin: "http://localhost:8080" }));
-// const server = require("./https")(app);
 const port = process.env.PORT || 5000;
 app.listen(port, () => {
     console.log(`Running on port ${port}`);
 });
+
+// const server = require("./https")(app);
 
 // server.listen(port, () => {
 //     console.log("https");
@@ -46,13 +51,16 @@ const axiosConfig = {
 };
 
 axios.config = axiosConfig;
+app.use(cookieParser());
 
-// app.get("/", (req, res) => {
-//     res.send("Welcome to my Nodemon API!");
-// });
+const sessionStore = new MongoStore({
+    mongooseConnection: mongoose.connection
+});
 
-// const routes = require("./routes/AuctionRouter");
-// app.use("/api", routes);
+app.use(session({
+    secret: "SECRET",
+    store: sessionStore
+}));
 
 app
     .get("/", (req, res) => {
@@ -60,62 +68,98 @@ app
     });
 app
     .get("/api/message/all", messageController.getAllMessagesByClientUsername);
-app.get("/api/auction", auctionController.getAuctionById);
+app
+    .get("/api/auction", auctionController.getAuctionById);
 
-const users = [];
-let messages = [];
+const isAuth = (req, res, next) => {
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    res.status(403);
+};
 
-const ChatSchema = mongoose.Schema({
-    username: String,
-    msg: String
-});
+const rejectMethod = (_req, res, _next) => {
+    res.sendStatus(405);
+};
 
-const ChatModel = mongoose.model("chat", ChatSchema);
-
-ChatModel.find((err, result) => {
-    if (err) throw err;
-
-    messages = result;
-});
-
-io.on("connection", socket => {
-    socket.on("example", function (data) {
-        io.emit("example", data);
-    });
-
-    socket.emit("loggedIn", {
-        users: users.map(s => s.username),
-        messages: messages
-    });
-
-    socket.on("newuser", username => {
-        console.log(`${username} has arrived at the party.`);
-        socket.username = username;
-
-        users.push(socket);
-
-        io.emit("userOnline", socket.username);
-    });
-
-    socket.on("msg", msg => {
-        const message = new ChatModel({
-            username: socket.username,
-            msg: msg
+app
+    .get("/users", passport.authenticate("basic", {
+        session: false
+    }), (req, res) => {
+        User.find({}, (err, data) => {
+            if (err) {
+                res.status(500).send();
+            } else {
+                res.json(data);
+            }
         });
+    })
+    .all(rejectMethod);
 
-        message.save((err, result) => {
-            if (err) throw err;
-
-            messages.push(result);
-
-            io.emit("msg", result);
-        });
+app
+    .get("/currentUser", (req, res) => {
+        if (req.isAuthenticated()) {
+            res.send({
+                username: req.user.username,
+                isAuth: req.isAuthenticated()
+            });
+        } else {
+            res.send({
+                message: "Not logged in"
+            });
+        }
     });
 
-    // Disconnect
-    socket.on("disconnect", () => {
-        console.log(`${socket.username} has left the party.`);
-        io.emit("userLeft", socket.username);
-        users.splice(users.indexOf(socket), 1);
+app
+    .post("/login", passport.authenticate("local"), async (req, res) => {
+        await res.json({
+            message: "success"
+        });
+    })
+    .all(rejectMethod);
+
+app
+    .get("/logout", isAuth, (req, res) => {
+        req.logout();
+        res.status(200).json({
+            isAuth: req.isAuthenticated()
+        });
+    })
+    .all(rejectMethod);
+
+app
+    .post("/register", async (req, res) => {
+        try {
+            const user = new User({
+                username: req.body.username,
+                password: req.body.password
+            });
+            const doc = await user.save();
+            res.json(doc);
+        } catch (err) {
+            res.status(422);
+        }
+    })
+    .all(rejectMethod);
+
+io.use(passportSocketIo.authorize({
+    cookieParser: cookieParser, // the same middleware you registrer in express
+    key: "express.sid", // the name of the cookie where express/connect stores its session_id
+    secret: "SECRET", // the session_secret to parse the cookie
+    store: sessionStore // we NEED to use a sessionstore. no memorystore please
+    // success: onAuthorizeSuccess, // *optional* callback on success - read more below
+    // fail: onAuthorizeFail // *optional* callback on fail/error - read more below
+}));
+
+io.on("connection", (socket) => {
+    socket.on("joinAuction", (data) => {
+    });
+    socket.on("startAuction", (data) => {
+    });
+    socket.on("leaveAuction", (data) => {
+    });
+    socket.on("newBid", (data) => {
+    });
+    socket.on("messages", (data) => {
     });
 });

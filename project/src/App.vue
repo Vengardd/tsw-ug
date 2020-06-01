@@ -1,27 +1,30 @@
 <template>
   <div id="app">
+    <Navbar />
     <img alt="Vue logo" src="./assets/logo.png">
     <!-- <PostComponent msg="Welcome to Your Vue.js App"/> -->
     <AuctionComponent />
-    <Login />
+    <router-link to="login">Login</router-link>
   </div>
 </template>
 
 <script>
 // import PostComponent from "./components/PostComponent.vue";
-import io from "socket.io-client";
+// import io from "socket.io-client";
 import AuctionComponent from "./components/AuctionComponent.vue";
-import Login from "./components/Login";
+import Navbar from "@/components/Navbar";
+// import Login from "./components/Login";
 
-const socket = io('http://localhost');
+// const socket = io("http://localhost:5000");
 
 export default {
     name: "App",
     components: {
         // PostComponent,
         AuctionComponent,
-        Login,
-        io
+        Navbar
+        // Login
+        // io
     }
 };
 </script>
