@@ -74,12 +74,6 @@ exports.deleteAuction = async (req, res) => {
     return auction;
 };
 
-async function hello (auctionId, doc) {
-    const lastAuctionProcess = await AuctionProcess.findOne({ auctionId: auctionId }).sort({ price: -1 });
-    doc.buyerUserId = lastAuctionProcess.bidderId;
-    doc.actualPrice = lastAuctionProcess.price;
-};
-
 exports.startAuction = async (req, res) => {
     const idFiltr = { _id: req.body.auctionId };
     Auction.findOne(idFiltr, async (err, doc) => {
@@ -89,12 +83,12 @@ exports.startAuction = async (req, res) => {
                    doc.startAuction != null) {
             doc.startDate = new Date();
             if (doc.type === "BID") {
-                setTimeout(() => {
-                    const lastAuctionProcess = AuctionProcess.findOne({ auctionId: doc._id }).sort({ price: -1 });
-                    doc.buyerUserId = lastAuctionProcess.bidderId;
-                    doc.actualPrice = lastAuctionProcess.price;
-                    doc.save();
-                }, doc.duration);
+                // setTimeout(() => {
+                //     const lastAuctionProcess = AuctionProcess.findOne({ auctionId: doc._id }).sort({ price: -1 });
+                //     doc.buyerUserId = lastAuctionProcess.bidderId;
+                //     doc.actualPrice = lastAuctionProcess.price;
+                //     doc.save();
+                // }, doc.duration);
             } else {
                 doc.startAuction = new Date();
                 doc.save();

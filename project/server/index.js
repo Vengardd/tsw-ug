@@ -10,8 +10,8 @@ const userController = require("./controller/UserController");
 const axios = require("axios");
 const mongoose = require("mongoose");
 const mongos = require("./mongoose");
-const session = require("express-session");
-const MongoStore = require("connect-mongo")(session);
+const expressSesion = require("express-session");
+const MongoStore = require("connect-mongo")(expressSesion);
 const passportSocketIo = require("passport.socketio");
 const cookieParser = require("cookie-parser");
 
@@ -22,20 +22,31 @@ const cookieParser = require("cookie-parser");
 
 const app = express();
 app.use(bodyParser.json());
-app.use(cookieParser);
+app.use(cookieParser());
+app.use(express.urlencoded({ extended: false }));
 app.use(cors({ credentials: true, origin: "http://localhost:8080" }));
-const port = process.env.PORT || 5000;
-app.listen(port, () => {
-    console.log(`Running on port ${port}`);
-});
+const port = 5000;
 
 // const server = require("./https")(app);
 
 // server.listen(port, () => {
 //     console.log("https");
 // });
+const store = new MongoStore({
+    mongooseConnection: mongoose.connection
+});
+
+app.use(expressSesion({
+    key: "connect.sid",
+    secret: "SECRET",
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: true },
+    store: store
+}));
 
 app.use(passport.initialize());
+app.use(passport.session());
 
 const http = require("http").Server(app);
 var io = require("socket.io")(http, { origins: "*:*" });
@@ -49,27 +60,17 @@ const axiosConfig = {
         "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE"
     }
 };
-
 axios.config = axiosConfig;
-app.use(cookieParser());
 
-const sessionStore = new MongoStore({
-    mongooseConnection: mongoose.connection
-});
-
-app.use(session({
-    secret: "SECRET",
-    store: sessionStore
-}));
+app
+    .get("/api/message/all", messageController.getAllMessagesByClientUsername);
+app
+    .get("/api/auction", auctionController.getAuctionById);
 
 app
     .get("/", (req, res) => {
         res.send("test");
     });
-app
-    .get("/api/message/all", messageController.getAllMessagesByClientUsername);
-app
-    .get("/api/auction", auctionController.getAuctionById);
 
 const isAuth = (req, res, next) => {
     if (req.isAuthenticated()) {
@@ -80,14 +81,6 @@ const isAuth = (req, res, next) => {
 
 const rejectMethod = (_req, res, _next) => {
     res.sendStatus(405);
-};
-
-const processErrors = (err) => {
-    const msg = {};
-    for (const key in err.errors) {
-        msg[key] = err.errors[key].message;
-    }
-    return msg;
 };
 
 app
@@ -116,7 +109,8 @@ app
                 message: "Not logged in"
             });
         }
-    });
+    })
+    .all(rejectMethod);
 
 app
     .post("/login", passport.authenticate("local"), async (req, res) => {
@@ -146,7 +140,7 @@ app
                 email: req.body.email
             });
             const doc = await user.save();
-            res.json(doc);
+            res.status(201).json(doc);
         } catch (err) {
             res.status(422);
         }
@@ -176,24 +170,52 @@ app
 //     .get("/history", isAuth, messageController.getHistoryForUser)
 //     .all(rejectMethod);
 
-io.use(passportSocketIo.authorize({
-    cookieParser: cookieParser, // the same middleware you registrer in express
-    key: "express.sid", // the name of the cookie where express/connect stores its session_id
-    secret: "SECRET", // the session_secret to parse the cookie
-    store: sessionStore // we NEED to use a sessionstore. no memorystore please
-    // success: onAuthorizeSuccess, // *optional* callback on success - read more below
-    // fail: onAuthorizeFail // *optional* callback on fail/error - read more below
-}));
+io.use(
+    passportSocketIo.authorize({
+        key: "connect.sid",
+        secret: "SECRET",
+        store: store,
+        passport: passport,
+        cookieParser: cookieParser
+    })
+);
 
-io.on("connection", (socket) => {
-    socket.on("joinAuction", (data) => {
+io.on("connection", socket => {
+    console.log(`Made socket connection: ${socket.id}`);
+    const username = socket.request.user.username;
+    socket.on("join-auction", data => {
+        if (socket.request.user.logged_in) {
+            console.log(
+                `Socket: User { ${username} } is joining { ${socket.id} }`
+            );
+            socket.join(data.id);
+        }
     });
-    socket.on("startAuction", (data) => {
+    socket.on("start-auction", data => {
+        if (socket.request.user.logged_in) {
+            console.log(`New auction socket created, id: { ${data.id} }`);
+        }
     });
-    socket.on("leaveAuction", (data) => {
+    socket.on("leave-auction", data => {
+        if (socket.request.user.logged_in) {
+            console.log(
+                `Socket: User { ${username} } is leaving { ${socket.id} }`
+            );
+            socket.leave(data.socketId);
+        }
     });
-    socket.on("newBid", (data) => {
+    socket.on("new-bid", data => {
+        if (socket.request.user.logged_in) {
+            console.log(`Socket: New bid from user { ${username} }`);
+            const renamedData = {
+                bid: data.bid,
+                bidder: username
+            };
+            io.sockets.in(data.id).emit("new-bid", renamedData);
+        }
     });
-    socket.on("messages", (data) => {
-    });
+});
+
+app.listen(port, () => {
+    console.log(`Running on port ${port}`);
 });
