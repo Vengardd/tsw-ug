@@ -1,8 +1,6 @@
 const passport = require("passport");
 const passportLocal = require("passport-local");
-const passportHttp = require("passport-http");
-const User = require("../models/user");
-const mongoose = require("mongoose");
+const User = require("../model/user");
 
 const validateUser = (username, password, done) => {
     User.findOne({ username: username }, function (err, user) {
@@ -17,17 +15,15 @@ const validateUser = (username, password, done) => {
 };
 
 passport.use(new passportLocal.Strategy(validateUser));
-passport.use(new passportHttp.BasicStrategy(validateUser));
 
 passport.serializeUser((user, done) => {
-    console.log(user);
-    // console.log(user._id);
-    done(null, user.username);
+    console.log("serialize " + user._id);
+    done(null, user.id);
 });
 
-passport.deserializeUser((username, done) => {
-    console.log(username);
-    User.findOne({ username: username }, (err, user) => {
+passport.deserializeUser((id, done) => {
+    console.log("deserialize " + id);
+    User.findOne({ _id: id }, (err, user) => {
         if (err) {
             done(err);
         }
@@ -35,10 +31,7 @@ passport.deserializeUser((username, done) => {
             done(null, {
                 id: user._id,
                 username: user.username,
-                password: user.password,
-                email: user.email,
-                name: user.name,
-                surname: user.surname
+                password: user.password
             });
         } else {
             done({

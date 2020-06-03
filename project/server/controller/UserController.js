@@ -1,12 +1,21 @@
-const User = require("../models/user");
+const express = require("express");
+const router = express.Router();
+const passport = require("../passport");
+const userService = require("../service/UserService");
 
-exports.getAllUsers = async (req, res) => {
-    const allUsers = await User.find();
-    res.json(allUsers);
-    return allUsers;
-};
+router.route("/login")
+    .post(passport.authenticate("local"), (req, res) => res.status(200).send(req.user))
+    .get((req, res) => {
+        if (req.isAuthenticated()) {
+            console.log("aa");
+            res.json(req.user);
+        } else {
+            console.log("bb");
+            res.status(401).send();
+        }
+    });
 
-exports.getUsernameById = async (id) => {
-    const user = await User.findById(id);
-    return user;
-};
+router.route("/register")
+    .post(userService.registerUser);
+
+module.exports = router;

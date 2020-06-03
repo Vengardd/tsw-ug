@@ -2,25 +2,35 @@
   <div>
     <ul>
       <li class="auction-list" v-for="auction in auctions" :key="auction._id">
-          <Auction :auction="auction" :currUser="currUser"/>
+          <Auction :auction="auction"/>
       </li>
     </ul>
+    <button @click="loadNewAuctions">Wczytaj kolejne aukcje</button>
   </div>
 </template>
 
 <script>
-import Auction from "@/components/Auction";
+import Auction from "./Auction";
 
 export default {
     name: "AuctionList",
+    data: function () {
+        return {
+            auctions: ""
+        };
+    },
     components: {
         Auction
     },
-    props: ["auctions"],
-    data () {
-        return {
-            currUser: this.$store.getters.currentUser
-        };
+    methods: {
+        loadNewAuctions () {
+            this.$store.dispatch("loadNextAuctions");
+            this.auctions = this.$store.getters.auctions;
+        }
+    },
+    created () {
+        this.$store.dispatch("startAuction");
+        this.auctions = this.$store.getters.auctions;
     }
 };
 </script>

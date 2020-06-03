@@ -1,15 +1,10 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import axios from "axios";
 
 import auth from "./auth";
+import auction from "./auction";
 
 Vue.use(Vuex);
-
-axios.interceptors.request.use(request => {
-    console.log("Starting Request", request);
-    return request;
-});
 
 export default new Vuex.Store({
     state: {
@@ -19,6 +14,7 @@ export default new Vuex.Store({
     actions: {
     },
     modules: {
-        auth
+        auth,
+        auction
     }
 });

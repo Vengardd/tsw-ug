@@ -6,7 +6,7 @@ const AuctionSchema = new Schema({
     description: { type: String },
     startDate: { type: Date, required: true },
     buyDate: { type: Date },
-    endDate: { type: Date, required: true },
+    endDate: { type: Date },
     type: { type: String, enum: ["BUY", "BID"] },
     duration: { type: Number },
     sellerUserId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
@@ -16,5 +16,4 @@ const AuctionSchema = new Schema({
 
 const Auction = mongoose.model("Auction", AuctionSchema);
 
-// Export the model
 module.exports = Auction;

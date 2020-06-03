@@ -27,17 +27,19 @@ export default {
         };
     },
     computed: {
-        ...mapGetters(["currentUser"])
+        ...mapGetters(["username"])
     },
     methods: {
-        ...mapActions(["fetchCurrentUser"]),
+        ...mapActions(["getUser"]),
         handleSubmit () {
             axios
-                .post("http://localhost:5000/login", this.user)
+                .post("http://localhost:5000/api/login", this.user)
                 .then(res => {
+                    this.$store.commit("authRefresh", { username: this.user.username, isAuth: true });
                     router.push("/");
                 })
                 .catch(err => {
+                    this.$store.commit("authLogout");
                     console.log(err);
                 });
         }

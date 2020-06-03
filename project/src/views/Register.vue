@@ -7,12 +7,6 @@
       placeholder="Username" minLength="3" required="">
       <input v-model="user.password" type="password" name="password" id="password"
       placeholder="Password" required="">
-      <input v-model="user.email" type="text" name="email" id="email"
-      placeholder="Email" required="">
-      <input v-model="user.name" type="text" name="name" id="name"
-      placeholder="Name" required="">
-      <input v-model="user.surname" type="text" name="surname" id="surname"
-      placeholder="Surname" required="">
       <button type="submit">Register</button>
     </form>
 </div>
@@ -30,17 +24,14 @@ export default {
         return {
             user: {
                 username: "",
-                password: "",
-                email: "",
-                name: "",
-                surname: ""
+                password: ""
             }
         };
     },
     methods: {
         handleSubmit () {
             axios
-                .post("http://localhost:5000/register", this.user)
+                .post("http://localhost:5000/api/register", this.user)
                 .then(() => {
                     router.push("/login");
                 })

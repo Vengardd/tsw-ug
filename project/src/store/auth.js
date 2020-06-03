@@ -1,45 +1,27 @@
-import axios from "axios";
-// import router from "../router";
-
 const state = {
-    currentUser: {
-        username: null,
-        isAuth: false
-    }
+    username: "",
+    isAuth: false
 };
 
 const getters = {
-    currentUser: state => state.currentUser
+    username: state => state.username,
+    isAuth: state => state.isAuth
 };
 
 const actions = {
-    fetchCurrentUser ({ commit }) {
-        return new Promise((resolve, reject) => {
-            axios.get("http://localhost:5000/currentUser", { withCredentials: true })
-                .then((resp) => {
-                    console.log("a");
-                    console.log(resp.data);
-                    commit("authRefresh", resp.data);
-                    resolve(resp);
-                })
-                .catch((err) => {
-                    console.log("b");
-                    commit("authNotLoggedIn");
-                    reject(err);
-                });
-        });
-    }
 };
 
 const mutations = {
     authRefresh (state, data) {
+        console.log("authRefresh");
         console.log(data);
-        state.currentUser.username = data.username;
-        state.currentUser.isAuth = data.isAuth;
+        state.username = data.username;
+        state.isAuth = data.isAuth;
     },
-    authNotLoggedIn (state) {
-        state.currentUser.username = null;
-        state.currentUser.isAuth = false;
+    authLogout (state) {
+        console.log("logout");
+        state.username = null;
+        state.isAuth = false;
     }
 };
 
