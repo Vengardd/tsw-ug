@@ -39,6 +39,7 @@ export default {
                     router.push("/");
                 })
                 .catch(err => {
+                    this.$store.commit("authLogout");
                     console.log(err);
                 });
         }
