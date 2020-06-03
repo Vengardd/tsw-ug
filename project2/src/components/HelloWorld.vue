@@ -28,15 +28,20 @@
       <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
       <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
     </ul>
+    <AuctionList/>
   </div>
 </template>
 
 <script>
 
 import { mapGetters, mapActions } from "vuex";
+import AuctionList from "./AuctionList";
 
 export default {
     name: "HelloWorld",
+    components: {
+        AuctionList
+    },
     props: {
         msg: String
     },

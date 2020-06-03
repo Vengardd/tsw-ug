@@ -4,6 +4,7 @@ const cors = require("cors");
 const mongoose = require("./mongoose");
 const passport = require("./passport");
 const userController = require("./controller/UserController");
+const auctionController = require("./controller/AuctionController");
 
 const app = express();
 app.use(bodyParser());
@@ -17,6 +18,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use("/api", userController);
+app.use("/api", auctionController);
 
 app.get("/", function (req, res) {
     res.send("Hello World!");
