@@ -33,9 +33,10 @@ export default {
         ...mapActions(["getUser"]),
         handleSubmit () {
             axios
-                .post("http://localhost:5000/api/login", this.user)
+                .post(`${location.origin}/api/login`, this.user, { withCredentials: true })
                 .then(res => {
-                    this.$store.commit("authRefresh", { username: this.user.username, isAuth: true });
+                    axios.get(`${location.origin}/api/login`, { withCredentials: true });
+                    this.$store.commit("authRefresh", { id: res.data._id, username: this.user.username, isAuth: true });
                     router.push("/");
                 })
                 .catch(err => {
@@ -84,10 +85,6 @@ div{
         text-align: center;
         padding:10px 10px;
     }
-    input:focus {
-        border:1px solid orange !important;
-         outline: none
-        }
     ::placeholder{ color: orange}
     }
 </style>

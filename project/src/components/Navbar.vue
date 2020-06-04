@@ -7,13 +7,16 @@
             <router-link to="/">Home</router-link>
           </li>
           <li v-if="isAuth" class="nav-item">
-            <router-link to="/my-bids">My bids</router-link>
+            <router-link to="/bidList">My bids</router-link>
           </li>
           <li v-if="isAuth" class="nav-item">
-            <router-link to="/my-auctions">My offers</router-link>
+            <router-link to="/myAuctions">My auctions</router-link>
           </li>
           <li v-if="isAuth" class="nav-item">
-            <router-link to="/my-history">My History</router-link>
+            <router-link to="/newAuction">New auction</router-link>
+          </li>
+          <li v-if="isAuth" class="nav-item">
+            <router-link to="/messenger">Messenger</router-link>
           </li>
           <!-- on the right side -->
           <li v-if="isAuth" class="nav-item">

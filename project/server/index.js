@@ -1,29 +1,70 @@
-const express = require("express");
-const bodyParser = require("body-parser");
-const cors = require("cors");
-const mongoose = require("./mongoose");
-const passport = require("./passport");
+require("dotenv").config();
+const path = require("path");
+const serveStatic = require("serve-static");
 const userController = require("./controller/UserController");
 const auctionController = require("./controller/AuctionController");
+const messageController = require("./controller/MessageController");
+const mongus = require("./mongoose");
+const express = require("express");
+const cookieParser = require("cookie-parser");
+const expressSession = require("express-session");
+const MongoStore = require("connect-mongo")(expressSession);
+const mongoose = require("mongoose");
+const passport = require("passport");
+const cors = require("cors");
+
+const mongoStore = new MongoStore({ mongooseConnection: mongoose.connection });
 
 const app = express();
-app.use(bodyParser());
-app.use(cors());
-app.use(require("express-session")({
-    secret: "keyboard cat",
-    resave: true,
-    saveUninitialized: true
+
+app.use(cors({ credentials: true, origin: "*:*" }));
+
+app.use(express.json());
+app.use(cookieParser());
+app.set("trust proxy", 1);
+app.use(expressSession({
+    secret: "SECRET",
+    resave: false,
+    saveUninitialized: true,
+    store: mongoStore,
+    cookie: { secure: false }
 }));
+app.use(express.urlencoded({ extended: false }));
+
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use((req, res) => {
+    res.status(404).json({
+        error: `URL NOT FOUNND: ${req.method} ${req.originalUrl}`
+    });
+});
+
+app.use(serveStatic(path.join(__dirname, "./public")));
+
+// app.get(/.*/, (req, res) => res.sendFile(path.join(__dirname, "/public/index.html")));
+
 app.use("/api", userController);
 app.use("/api", auctionController);
+app.use("/api", messageController);
 
 app.get("/", function (req, res) {
     res.send("Hello World!");
 });
 
-app.listen(5000, () => {
-    console.log("Example app listening on port 5000!");
-});
+const httpPort = process.env.PORT || 5000;
+const httpsPort = process.env.PORT || 443;
+console.log(httpsPort);
+const server = require("./https")(app).listen(httpsPort);
+
+const passportSocketIo = require("passport.socketio");
+const io = require("socket.io")(server);
+io.use(passportSocketIo.authorize({
+    key: "connect.sid",
+    secret: "SECRET",
+    store: mongoStore,
+    passport: passport,
+    cookieParser: cookieParser
+}));
+
+require("./socket")(io);

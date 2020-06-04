@@ -3,7 +3,7 @@ const passportLocal = require("passport-local");
 const User = require("../model/user");
 
 const validateUser = (username, password, done) => {
-    User.findOne({ username: username }, function (err, user) {
+    User.findOne({ username: username }, async (err, user) => {
         if (err) {
             return done(err);
         }
@@ -17,12 +17,10 @@ const validateUser = (username, password, done) => {
 passport.use(new passportLocal.Strategy(validateUser));
 
 passport.serializeUser((user, done) => {
-    console.log("serialize " + user._id);
     done(null, user.id);
 });
 
 passport.deserializeUser((id, done) => {
-    console.log("deserialize " + id);
     User.findOne({ _id: id }, (err, user) => {
         if (err) {
             done(err);

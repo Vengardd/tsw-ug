@@ -31,7 +31,7 @@ export default {
     methods: {
         handleSubmit () {
             axios
-                .post("http://localhost:5000/api/register", this.user)
+                .post(`${location.origin}/api/register`, this.user, { withCredentials: true })
                 .then(() => {
                     router.push("/login");
                 })

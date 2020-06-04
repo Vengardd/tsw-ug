@@ -1,3 +1,4 @@
+
 import axios from "axios";
 // import router from "../router";
 
@@ -13,21 +14,34 @@ const getters = {
 
 const actions = {
     startAuction ({ commit }) {
-        axios.get("http://localhost:5000/api/auctions" + "?page=" + state.actualSite)
+        axios.get(`${location.origin}/api/auctions` + "?page=" + state.actualSite)
             .then(res => {
                 commit("startPage", res.data);
                 console.log("start");
                 console.log(res.data);
             });
     },
-    loadNextAuctions ({ commit }) {
-        axios.get("http://localhost:5000/api/auctions" + "?page=" + (state.actualSite + 1))
+    loadAllNewAuctions ({ commit }) {
+        axios.get(`${location.origin}/api/auctions` + "?page=" + (state.actualSite + 1), { withCredentials: true })
             .then(res => {
                 commit("nextPage", res.data);
                 console.log("next");
                 console.log(res.data);
             }
             );
+    },
+    loadOwnNextAuctions ({ commit }) {
+        axios.get(`${location.origin}/api/auctions/byUser` + "?id=" + state.id, { withCredentials: true })
+            .then(res => {
+                commit("startPage", res.data);
+            }
+            );
+    },
+    loadAllBidAuctions ({ commit }) {
+        axios.get(`${location.origin}/api/auctions/ownBids`, { withCredentials: true })
+            .then(res => {
+                commit("startPage", res.data);
+            });
     }
 };
 

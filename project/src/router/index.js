@@ -3,7 +3,12 @@ import VueRouter from "vue-router";
 import Home from "../views/Home.vue";
 import Register from "../views/Register.vue";
 import Login from "../views/Login.vue";
+import AuctionOwnList from "../components/AuctionOwnList";
+import MessageSending from "../components/MessageChooser";
 import Navbar from "../components/Navbar.vue";
+import AuctionNew from "../components/AuctionNew.vue";
+import AuctionWithBids from "../components/AuctionWithBids.vue";
+import AuctionBidList from "../components/AuctionBidList";
 
 Vue.use(VueRouter);
 
@@ -24,9 +29,35 @@ const routes = [
         component: Login
     },
     {
+        path: "/myAuctions",
+        name: "MyAuctions",
+        component: AuctionOwnList
+    },
+    {
         path: "/navbar",
         name: "Navbar",
         component: Navbar
+    },
+    {
+        path: "/messenger",
+        name: "Messenger",
+        component: MessageSending
+    },
+    {
+        path: "/newAuction",
+        name: "NewAuction",
+        component: AuctionNew
+    },
+    {
+        path: "/bid",
+        name: "Bid",
+        component: AuctionWithBids,
+        props: true
+    },
+    {
+        path: "/bidList",
+        name: "AuctionWithBids",
+        component: AuctionBidList
     },
     {
         path: "/about",
