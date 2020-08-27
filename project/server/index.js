@@ -17,7 +17,7 @@ const mongoStore = new MongoStore({ mongooseConnection: mongoose.connection });
 
 const app = express();
 
-app.use(cors({ credentials: true, origin: "*:*" }));
+app.use(cors({ credentials: true, origin: "http://localhost:5001" }));
 
 app.use(express.json());
 app.use(cookieParser());
@@ -34,13 +34,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use((req, res) => {
-    res.status(404).json({
-        error: `URL NOT FOUNND: ${req.method} ${req.originalUrl}`
-    });
-});
-
-app.use(serveStatic(path.join(__dirname, "./public")));
+// app.use(serveStatic(path.join(__dirname, "./public")));
 
 // app.get(/.*/, (req, res) => res.sendFile(path.join(__dirname, "/public/index.html")));
 
@@ -55,7 +49,8 @@ app.get("/", function (req, res) {
 const httpPort = process.env.PORT || 5000;
 const httpsPort = process.env.PORT || 443;
 console.log(httpsPort);
-const server = require("./https")(app).listen(httpsPort);
+const server = app.listen(httpPort);
+// const server = require("./https")(app).listen(httpsPort);
 
 const passportSocketIo = require("passport.socketio");
 const io = require("socket.io")(server);
@@ -68,3 +63,9 @@ io.use(passportSocketIo.authorize({
 }));
 
 require("./socket")(io);
+
+app.use((req, res) => {
+    res.status(404).json({
+        error: `URL NOT FOUNND: ${req.method} ${req.originalUrl}`
+    });
+});

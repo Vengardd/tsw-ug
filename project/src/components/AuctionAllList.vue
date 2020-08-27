@@ -5,7 +5,7 @@
           <Auction :auction="auction"/>
       </li>
     </ul>
-    <button @click="loadAllNewAuctions">Wczytaj kolejne aukcje</button>
+    <button @click="loadNewAuctions">Wczytaj kolejne aukcje</button>
   </div>
 </template>
 
@@ -23,13 +23,14 @@ export default {
         Auction
     },
     methods: {
-        loadAllNewAuctions () {
-            this.$store.dispatch("loadAllNewAuctions");
+        loadNewAuctions () {
+            this.$store.dispatch("loadNewAuctions");
             this.auctions = this.$store.getters.auctions;
         }
     },
-    created () {
-        this.$store.dispatch("startAuction");
+    async created () {
+        this.$store.dispatch("resetAuctions");
+        await this.$store.dispatch("loadNewAuctions");
         this.auctions = this.$store.getters.auctions;
     }
 };

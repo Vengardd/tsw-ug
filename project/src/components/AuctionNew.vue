@@ -35,7 +35,7 @@ export default {
     name: "AuctionModifyComponent",
     methods: {
         onSubmit: function () {
-            axios.post(`${location.origin}/api/auction/addOrUpdate`, this.auction, { withCredentials: true });
+            axios.post(`http://localhost:5000/api/auction/addOrUpdate`, this.auction, { withCredentials: true });
             console.log("added new auction");
             router.push("/");
         }

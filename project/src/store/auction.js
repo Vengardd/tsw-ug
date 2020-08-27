@@ -4,7 +4,7 @@ import axios from "axios";
 
 const state = {
     auctions: [],
-    actualSite: 1
+    actualSite: 0
 };
 
 const getters = {
@@ -13,16 +13,8 @@ const getters = {
 };
 
 const actions = {
-    startAuction ({ commit }) {
-        axios.get(`${location.origin}/api/auctions` + "?page=" + state.actualSite)
-            .then(res => {
-                commit("startPage", res.data);
-                console.log("start");
-                console.log(res.data);
-            });
-    },
-    loadAllNewAuctions ({ commit }) {
-        axios.get(`${location.origin}/api/auctions` + "?page=" + (state.actualSite + 1), { withCredentials: true })
+    loadNewAuctions ({ commit }) {
+        return axios.get("http://localhost:5000/api/auctions" + "?page=" + (state.actualSite + 1), { withCredentials: true })
             .then(res => {
                 commit("nextPage", res.data);
                 console.log("next");
@@ -31,23 +23,27 @@ const actions = {
             );
     },
     loadOwnNextAuctions ({ commit }) {
-        axios.get(`${location.origin}/api/auctions/byUser` + "?id=" + state.id, { withCredentials: true })
+        // console.log("USER ID: " + this.$store.getters.id);
+        return axios.get("http://localhost:5000/api/auctions/byUser" + "?id=" + getters.id, { withCredentials: true })
             .then(res => {
                 commit("startPage", res.data);
             }
             );
     },
     loadAllBidAuctions ({ commit }) {
-        axios.get(`${location.origin}/api/auctions/ownBids`, { withCredentials: true })
+        return axios.get("http://localhost:5000/api/auctions/ownBids", { withCredentials: true })
             .then(res => {
                 commit("startPage", res.data);
             });
+    },
+    resetAuctions () {
+        state.actualSite = 0;
+        state.auctions = [];
     }
 };
 
 const mutations = {
     startPage (state, newAuctions) {
-        console.log("ASDASDAS");
         state.actualSite = 1;
         state.auctions = newAuctions;
     },

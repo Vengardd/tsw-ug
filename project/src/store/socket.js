@@ -1,7 +1,7 @@
 import io from "socket.io-client";
 
 const state = {
-    socket: io.connect(`${location.origin}`)
+    socket: io.connect("http://localhost:5000")
 };
 
 const getters = {

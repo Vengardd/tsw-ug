@@ -21,8 +21,8 @@ export default {
     components: {
         Auction
     },
-    created () {
-        this.$store.dispatch("loadOwnNextAuctions");
+    async created () {
+        await this.$store.dispatch("loadOwnNextAuctions");
         this.auctions = this.$store.getters.auctions;
     }
 };

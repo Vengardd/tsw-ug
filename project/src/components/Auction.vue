@@ -28,11 +28,11 @@
     <div v-if="auction.startDate && auction.type === 'BID'">
         <router-link :to="{ name: 'Bid', params: { auction: auction } }" tag="button" >Go to bids</router-link>
     </div>
-    <form v-if="id && id !== auction.sellerUserId && !auction.buyDate" @submit.prevent="makeBid">
+    <form v-if="id && id !== auction.sellerUserId && !auction.buyDate && auction.type === 'BID'" @submit.prevent="makeBid">
             <label>Bid: </label>
            <input v-model="bid" name="bid" type="text">
         <button type="submit">Bid</button>
-        </form>
+    </form>
   </div>
 </div>
 </template>
@@ -42,9 +42,16 @@ import { mapGetters, mapActions } from "vuex";
 import axios from "axios";
 import router from "../router";
 import AuctionModify from "./AuctionModify";
+const io = require("socket.io-client");
 
 export default {
     name: "Auction",
+    data () {
+        return {
+            bid: this.auction.actualPrice + 1,
+            socket: io("http://localhost:5000")
+        };
+    },
     components: {
         AuctionModify
     },
@@ -58,25 +65,22 @@ export default {
             return this.auction.sellerUserId === this.$store.getters.id;
         },
         startAuction () {
-            console.log(this.auction);
-            axios.get(`${location.origin}/api/startAuction?id=${this.auction._id}`, { withCredentials: true })
-                .then((res) => {
-                    console.log("ASD");
-                    console.log(res.status);
-                }
-                );
+            axios.get(`http://localhost:5000/api/startAuction?id=${this.auction._id}`, { withCredentials: true })
+                .then(res => {
+                    this.$set(this, "auction", res.data);
+                    console.log(this.auction);
+                    console.log(res.data);
+                });
         },
         buyNow () {
-            axios.get(`${location.origin}/api/auction/buyNow/${this.auction._id}`, { withCredentials: true });
-            axios.get(`${location.origin}/api/auction/${this.auction._id}`, { withCredentials: true })
+            axios.get(`http://localhost:5000/api/auction/buyNow/${this.auction._id}`, { withCredentials: true })
                 .then(res => {
+                    console.log(this.auction);
                     console.log(res.data);
                     this.auction = res.data;
                 });
         },
         goToBids () {
-            console.log("go to bid");
-            console.log(this.auction);
             router.push({
                 name: "Bid",
                 props: {
@@ -98,11 +102,10 @@ export default {
             }
         },
         bidSockets: function () {
-            console.log("listening bids");
             this.socket.on("newBid", (data) => {
                 if (data.auctionId === this.auction._id) {
-                    console.log(data);
                     this.auction.actualPrice = data.actualPrice;
+                    this.bid = this.auction.actualPrice + 1;
                 }
             });
             this.socket.on("endOfAuction", (auctionId) => {
@@ -111,6 +114,19 @@ export default {
                 };
             });
         }
+    },
+    created () {
+        this.socket.on("newBid", (data) => {
+            if (data.auctionId === this.auction._id) {
+                console.log(data);
+                this.auction.actualPrice = data.price;
+            }
+        });
+        this.socket.on("endOfAuction", (auctionId) => {
+            if (auctionId === this.auction._id) {
+                this.auction.buyDate = this.auction.endDate;
+            };
+        });
     }
 };
 </script>

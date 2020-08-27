@@ -18,6 +18,7 @@ const setup = (socketIo) => {
                 await newBid.save();
                 console.log(newBid);
                 await Auction.updateOne({ _id: data.auctionId }, { $set: { actualPrice: newBid.price } });
+                console.log("złapano nowy bid aaaaaa");
                 clientSocket.broadcast.emit("newBid", newBid);
             } else {
                 const bids = await AuctionProcess.find({ auctionId: auction._id })

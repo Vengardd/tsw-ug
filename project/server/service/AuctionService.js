@@ -8,7 +8,7 @@ const limitAuctionOnPage = 12;
 
 exports.getAllAuctions = async (req, res) => {
     const page = req.query.page;
-    const allAuctions = await Auction.find().limit(limitAuctionOnPage).skip((page - 1) * limitAuctionOnPage);
+    const allAuctions = await Auction.find({ startDate: { $exists: true, $ne: null } }).limit(limitAuctionOnPage).skip((page - 1) * limitAuctionOnPage);
     res.send(allAuctions);
     return allAuctions;
 };
@@ -80,35 +80,29 @@ exports.addOrUpdateAuction = async (req, res) => {
 };
 
 exports.startAuction = async (req, res) => {
-    console.log("ASDASDDA");
     const id = req.query.id;
-    console.log(id);
-    const auction = await Auction.findOne({ _id: id });
+    // const auction = await Auction.findOne({ _id: id });
     const newStartDate = new Date();
-    console.log(newStartDate.getTime() + auction.duration * 1000);
-    const newEndDate = new Date(newStartDate.getTime() + auction.duration * 1000);
-    console.log(auction);
+    const newEndDate = new Date(newStartDate.getTime() + 909090909 * 1000);
     // newEndDate.setTime(newStartDate.getTime() + (auction.duration * 60 * 1000));
+    console.log(newStartDate);
     const newFields = {
         startDate: newStartDate,
         endDate: newEndDate
     };
-    console.log(newFields);
-    await Auction.findOneAndUpdate({ _id: id }, newFields);
+    const newAuction = await Auction.findOneAndUpdate({ _id: id }, newFields, { new: true });
+    console.log(newAuction);
+    return res.json(newAuction);
 };
 
 exports.buyNow = async (req, res) => {
-    console.log(req.user);
     const id = req.user.id;
     const auctionId = req.params.id;
-    console.log(id);
-    console.log(auctionId);
     const newFields = {
         buyDate: new Date(),
         buyerUserId: id
     };
-    await Auction.updateOne({ _id: auctionId }, newFields);
-    res.status(200);
+    return await Auction.findOneAndUpdate({ _id: auctionId }, newFields);
 };
 
 exports.getBids = async (req, res) => {

@@ -7,6 +7,9 @@ const validateUser = (username, password, done) => {
         if (err) {
             return done(err);
         }
+        if (user.password !== password) {
+            return done(null, false, { message: "Incorrect password." });
+        }
         if (!user) {
             return done(null, false, { message: "Incorrect username." });
         }

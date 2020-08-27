@@ -33,10 +33,11 @@ export default {
         ...mapActions(["getUser"]),
         handleSubmit () {
             axios
-                .post(`${location.origin}/api/login`, this.user, { withCredentials: true })
+                .post("http://localhost:5000/api/login", this.user, { withCredentials: true })
                 .then(res => {
-                    axios.get(`${location.origin}/api/login`, { withCredentials: true });
+                    axios.get("http://localhost:5000/api/login", { withCredentials: true });
                     this.$store.commit("authRefresh", { id: res.data._id, username: this.user.username, isAuth: true });
+                    console.log(res.data._id);
                     router.push("/");
                 })
                 .catch(err => {

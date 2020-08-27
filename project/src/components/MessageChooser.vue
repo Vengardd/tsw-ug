@@ -28,7 +28,7 @@ export default {
             message: "",
             receiver: "",
             showMessages: false,
-            socket: io(`${location.origin}`)
+            socket: io("http://localhost:5000")
         };
     },
     computed: {
@@ -38,7 +38,7 @@ export default {
         ...mapActions(["emitMessage", "getMessages"]),
         getMessagesRest: function () {
             console.log("Get messages rest");
-            axios.get(`${location.origin}/api/messages` + "?receiver=" + this.receiver, { withCredentials: true })
+            axios.get("http://localhost:5000/api/messages" + "?receiver=" + this.receiver, { withCredentials: true })
                 .then(res => {
                     this.showMessages = true;
                     this.messages = res.data;
