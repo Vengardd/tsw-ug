@@ -55,6 +55,7 @@ exports.getAllAuctionsOwnBids = async (req, res) => {
 };
 
 exports.addOrUpdateAuction = async (req, res) => {
+    console.log("WCHODZI TU");
     const auction = req.body;
     if (auction.isBuyNow) {
         auction.type = "BUY";
@@ -62,11 +63,17 @@ exports.addOrUpdateAuction = async (req, res) => {
         auction.type = "BID";
     }
     delete auction.isBuyNow;
-    if (req.user._id === auction.sellerUserId) {
+    console.log("TU TEZ");
+    console.log(auction);
+    console.log(req.user._id);
+    console.log(auction.sellerUserId);
+    console.log(req.user);
+    // console.log(req)
+    if (req.user.id === auction.sellerUserId !== undefined) {
         if (auction._id !== undefined) {
             console.log("actualise");
             await Auction.updateOne({ _id: auction._id }, { $set: auction });
-            res.status(201);
+            res.status(201).send(auction);
             return auction;
         } else {
             console.log("new");

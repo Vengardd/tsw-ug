@@ -39,9 +39,7 @@ export default {
             axios
                 .post("http://localhost:5000/api/login", this.user, { withCredentials: true })
                 .then(res => {
-                    axios.get("http://localhost:5000/api/login", { withCredentials: true });
                     this.$store.commit("authRefresh", { id: res.data._id, username: this.user.username, isAuth: true });
-                    console.log(res.data._id);
                     router.push("/");
                 })
                 .catch(err => {

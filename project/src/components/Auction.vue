@@ -20,6 +20,21 @@
         <AuctionModify :oldAuction="auction"/>
     </div>
     <div v-if="!auction.startDate && checkIfAuctionIsForUser()">
+        <form @submit.prevent="modifyAuction" ref="form">
+            <label> title  </label>
+            <input v-model="newAuction.title" type="text" name="title" id="title" minLength="3" required="" /> <br>
+            <label> description  </label>
+            <input v-model="newAuction.description" type="text" name="description" id="description" minLength="3" required="" /> <br>
+            <label> duration  </label>
+            <input v-model="newAuction.duration" type="number" name="duration" id="duration" required="" /> <br>
+            <label> actual price  </label>
+            <input v-model="newAuction.actualPrice" type="number" name="actualPrice" id="actualPrice" required="" /> <br>
+            <label> is buy now  </label>
+            <input v-model="newAuction.isBuyNow" type="checkbox" name="isBuyNow" id="isBuyNow" /> <br>
+            <button type="submit">Apply changes</button>
+        </form>
+    </div>
+    <div v-if="!auction.startDate && checkIfAuctionIsForUser()">
         <button @click="startAuction">Start auction</button>
     </div>
     <div v-if="!auction.buyDate && auction.startDate && !checkIfAuctionIsForUser() && this.$store.getters.id !== '' && auction.type === 'BUY'">
@@ -49,7 +64,14 @@ export default {
     data () {
         return {
             bid: this.auction.actualPrice + 1,
-            socket: io("http://localhost:5000")
+            socket: io("http://localhost:5000"),
+            newAuction: {
+                title: "",
+                description: "",
+                duration: 0,
+                actualPrice: 0,
+                isBuyNow: ""
+            }
         };
     },
     components: {
@@ -64,10 +86,19 @@ export default {
         checkIfAuctionIsForUser () {
             return this.auction.sellerUserId === this.$store.getters.id;
         },
+        modifyAuction: function () {
+            axios.post("http://localhost:5000/api/auction/addOrUpdate", this.newAuction, { withCredentials: true })
+                .then((res) => {
+                    this.$set(this, "auction", res.data);
+                    console.log(res);
+                }
+                );
+        },
         startAuction () {
             axios.get(`http://localhost:5000/api/startAuction?id=${this.auction._id}`, { withCredentials: true })
                 .then(res => {
-                    this.$set(this, "auction", res.data);
+                    this.$set(this.auction, "startDate", res.data.startDate);
+                    this.auction.startDate = res.data.startDate;
                     console.log(this.auction);
                     console.log(res.data);
                 });
@@ -127,6 +158,13 @@ export default {
                 this.auction.buyDate = this.auction.endDate;
             };
         });
+        this.newAuction._id = this.auction._id;
+        this.newAuction.title = this.auction.title;
+        this.newAuction.description = this.auction.description;
+        this.newAuction.duration = this.auction.duration;
+        this.newAuction.actualPrice = this.auction.actualPrice;
+        this.newAuction.isBuyNow = this.auction.isBuyNow;
+        this.newAuction.sellerUserId = this.auction.sellerUserId;
     }
 };
 </script>

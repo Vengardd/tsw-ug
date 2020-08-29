@@ -10,6 +10,7 @@
 
 <script>
 import Auction from "./Auction";
+import axios from "axios";
 
 export default {
     name: "AuctionAllList",
@@ -22,7 +23,13 @@ export default {
         Auction
     },
     async created () {
-        await this.$store.dispatch("loadOwnNextAuctions");
+        const userId = this.$store.getters.id;
+        axios.get("http://localhost:5000/api/auctions/byUser" + "?id=" + userId, { withCredentials: true })
+            .then(res => {
+                this.$store.commit("startPage", res.data);
+            }
+            );
+        // await this.$store.dispatch("loadOwnNextAuctions");
         this.auctions = this.$store.getters.auctions;
     }
 };

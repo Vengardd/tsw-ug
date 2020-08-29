@@ -1,5 +1,5 @@
-
 import axios from "axios";
+import auth from "../store/auth";
 // import router from "../router";
 
 const state = {
@@ -24,7 +24,8 @@ const actions = {
     },
     loadOwnNextAuctions ({ commit }) {
         // console.log("USER ID: " + this.$store.getters.id);
-        return axios.get("http://localhost:5000/api/auctions/byUser" + "?id=" + getters.id, { withCredentials: true })
+        const id = auth.getters.id;
+        return axios.get("http://localhost:5000/api/auctions/byUser" + "?id=" + id, { withCredentials: true })
             .then(res => {
                 commit("startPage", res.data);
             }

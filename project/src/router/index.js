@@ -9,6 +9,7 @@ import Navbar from "../components/Navbar.vue";
 import AuctionNew from "../components/AuctionNew.vue";
 import AuctionWithBids from "../components/AuctionWithBids.vue";
 import AuctionBidList from "../components/AuctionBidList";
+import store from "../store";
 
 Vue.use(VueRouter);
 
@@ -31,7 +32,10 @@ const routes = [
     {
         path: "/myAuctions",
         name: "MyAuctions",
-        component: AuctionOwnList
+        component: AuctionOwnList,
+        meta: {
+            requiresAuth: true
+        }
     },
     {
         path: "/navbar",
@@ -41,23 +45,35 @@ const routes = [
     {
         path: "/messenger",
         name: "Messenger",
-        component: MessageSending
+        component: MessageSending,
+        meta: {
+            requiresAuth: true
+        }
     },
     {
         path: "/newAuction",
         name: "NewAuction",
-        component: AuctionNew
+        component: AuctionNew,
+        meta: {
+            requiresAuth: true
+        }
     },
     {
         path: "/bid",
         name: "Bid",
         component: AuctionWithBids,
-        props: true
+        props: true,
+        meta: {
+            requiresAuth: true
+        }
     },
     {
         path: "/bidList",
         name: "AuctionWithBids",
-        component: AuctionBidList
+        component: AuctionBidList,
+        meta: {
+            requiresAuth: true
+        }
     },
     {
         path: "/about",
@@ -74,6 +90,18 @@ const routes = [
 const router = new VueRouter({
     mode: "history",
     routes
+});
+
+router.beforeEach((to, from, next) => {
+    if (to.matched.some(record => record.meta.requiresAuth)) {
+        if (!store.getters.isAuth) {
+            next({ name: "Login" });
+        } else {
+            next();
+        }
+    } else {
+        next();
+    }
 });
 
 export default router;

@@ -1,6 +1,6 @@
 <template>
     <div class="wrapper">
-            <form @submit.prevent="onSubmit()" ref="form" class="container">
+            <!-- <form @submit.prevent="onSubmit()" ref="form" class="container">
             <label> title  </label>
             <input v-model="auction.title" type="text" name="title" id="title" minLength="3" required="" /> <br>
             <label> description  </label>
@@ -12,12 +12,12 @@
             <label> is buy now  </label>
             <input v-model="auction.isBuyNow" type="checkbox" name="isBuyNow" id="isBuyNow" /> <br>
             <button type="submit">Apply changes</button>
-        </form>
+        </form> -->
     </div>
 </template>
 
 <script>
-import axios from "axios";
+// import axios from "axios";
 
 export default {
     data () {
@@ -35,8 +35,8 @@ export default {
     props: ["oldAuction"],
     methods: {
         onSubmit: function () {
-            axios.post(`http://localhost:5000/api/auction/addOrUpdate`, this.auction, { withCredentials: true })
-                .then(() => window.location.reload());
+            // axios.post(`http://localhost:5000/api/auction/addOrUpdate`, this.auction, { withCredentials: true })
+            // .then(() => window.location.reload());
         }
     },
     created () {
