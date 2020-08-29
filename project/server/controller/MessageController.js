@@ -3,7 +3,7 @@ const router = express.Router();
 const Message = require("../model/message");
 
 router.route("/messages")
-    .get(async (req, res) => {
+    .get(isLoggedIn, async (req, res) => {
         const receiver = req.query.receiver;
         const sender = req.user.username;
         const messages = await (await Message.find())
@@ -12,5 +12,12 @@ router.route("/messages")
         res.send(messages);
         return messages;
     });
+
+function isLoggedIn (req, res, next) {
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    res.redirect("/");
+}
 
 module.exports = router;
