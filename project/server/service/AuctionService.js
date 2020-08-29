@@ -63,18 +63,14 @@ exports.addOrUpdateAuction = async (req, res) => {
         auction.type = "BID";
     }
     delete auction.isBuyNow;
-    console.log("TU TEZ");
-    console.log(auction);
-    console.log(req.user._id);
-    console.log(auction.sellerUserId);
-    console.log(req.user);
-    // console.log(req)
     if (req.user.id === auction.sellerUserId !== undefined) {
         if (auction._id !== undefined) {
-            console.log("actualise");
-            await Auction.updateOne({ _id: auction._id }, { $set: auction });
-            res.status(201).send(auction);
-            return auction;
+            if (!auction.startDate) {
+                console.log("actualise");
+                await Auction.updateOne({ _id: auction._id }, { $set: auction });
+                res.status(201).send(auction);
+                return auction;
+            }
         } else {
             console.log("new");
             auction.sellerUserId = req.user.id;
