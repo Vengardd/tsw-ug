@@ -8,6 +8,9 @@
       <input v-model="user.password" type="password" name="password" id="password"
       placeholder="Password" required="">
       <button type="submit">Register</button>
+      <div v-if="errorMessage">
+        Error: {{errorMessage}}
+    </div>
     </form>
 </div>
 
@@ -25,7 +28,8 @@ export default {
             user: {
                 username: "",
                 password: ""
-            }
+            },
+            errorMessage: ""
         };
     },
     methods: {
@@ -36,7 +40,8 @@ export default {
                     router.push("/login");
                 })
                 .catch((err) => {
-                    console.log(err);
+                    console.log(err.response);
+                    this.errorMessage = "Cannot register. " + err.response.data.msg;
                 });
         }
     }

@@ -4,7 +4,7 @@ const User = require("../model/user");
 
 const validateUser = (username, password, done) => {
     User.findOne({ username: username }, async (err, user) => {
-        if (err) {
+        if (err || user === null) {
             return done(err);
         }
         if (user.password !== password) {

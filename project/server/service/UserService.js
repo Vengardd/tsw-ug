@@ -12,11 +12,16 @@ const addUser = async (username, password) => {
 };
 
 const registerUser = async (req, res) => {
-    if (!("username" in req.body) || !("password" in req.body)) {
-        res.status(400).send({ msg: "Missing username or password." });
-    } else {
-        res.status(201).json(await addUser(req.body.username, req.body.password));
+    const username = req.body.username;
+    const password = req.body.password;
+    if (!username || !password) {
+        return res.status(400).send({ msg: "Missing username or password." });
     }
+    const userExists = await User.findOne({ username: username }).exec();
+    if (userExists) {
+        return res.status(400).send({ msg: "User already exists." });
+    }
+    return res.status(201).json(await addUser(req.body.username, req.body.password));
 };
 module.exports = {
     addUser,

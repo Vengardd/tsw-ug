@@ -6,6 +6,9 @@
             <input v-model="user.username" type="text" name="username" id="username" placeholder="Username" minLength="3" required="" />
             <input v-model="user.password" type="password" name="password" id="password" placeholder="Password" required="" />
             <button type="submit">Log in</button>
+            <div v-if="errorMessage">
+                Error: {{errorMessage}}
+            </div>
         </form>
         </div>
     </div>
@@ -23,7 +26,8 @@ export default {
             user: {
                 username: "",
                 password: ""
-            }
+            },
+            errorMessage: ""
         };
     },
     computed: {
@@ -41,6 +45,7 @@ export default {
                     router.push("/");
                 })
                 .catch(err => {
+                    this.errorMessage = "Cannot login.";
                     this.$store.commit("authLogout");
                     console.log(err);
                 });
