@@ -21,44 +21,48 @@ exports.getAuction = async (req, res) => {
     return auction;
 };
 
-exports.getAllAuctionsByUser = async (req, res) => {
+exports.getAllUserAuctions = async (req, res) => {
     const id = req.user.id;
-    const allAuctions = await Auction.find();
-    const auctionsFromBids = await AuctionProcess.find({ bidder: req.user.username }).map(bid => bid.auctionId);
-    const allAuctionsByUser = await allAuctions
-        .filter(auction => {
-            if (auctionsFromBids) {
-                if (auctionsFromBids.includes(auction._id.toString())) {
-                    return true;
-                }
-            }
-            if (auction.sellerUserId.toString() == id) {
-                return true;
-            }
-            if (auction.buyerUserId) {
-                if (auction.buyerUserId.toString() == id) {
-                    return true;
-                }
-            }
-            return false;
-        });
-    res.send(allAuctionsByUser);
-    return allAuctionsByUser;
+    const allAuctions = await Auction.find({ sellerUserId: id });
+    console.log(allAuctions);
+    res.send(allAuctions);
 };
 
-exports.getAllAuctionsOwnBids = async (req, res) => {
+exports.getAllHistoryAuctions = async (req, res) => {
+    const id = req.user.id;
+    const participatedAuctionIds = await AuctionProcess.find({ bidder: req.user.username })
+        .distinct("auctionId");
+
+    const participatedAuctions = await Auction.find({
+        endDate: {
+            $lt: new Date()
+        },
+        _id: {
+            $in: participatedAuctionIds
+        }
+
+    }).exec();
+
+    const wonAuctions = await Auction.find({
+        buyerUserId: id
+    }).exec();
+
+    const result = new Set(wonAuctions);
+    participatedAuctions.forEach(a => result.add(a));
+    console.log(result);
+    res.send(Array.from(result));
+};
+
+exports.getCurrentBiddedAuctions = async (req, res) => {
     const auctionIdsFromBids = await AuctionProcess.find({ bidder: req.user.username })
         .distinct("auctionId");
     if (auctionIdsFromBids) {
-        // const auctions = await Auction.find()
-        //     .where('_id').in(auctionIdsFromBids)
-        //     .exec();
         const auctions = await Auction.find({
-            "endDate": {
-                "$gt": new Date()
+            endDate: {
+                $gt: new Date()
             },
-            "_id": {
-                "$in": auctionIdsFromBids
+            _id: {
+                $in: auctionIdsFromBids
             }
         })
             .exec();

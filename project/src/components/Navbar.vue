@@ -7,10 +7,13 @@
             <router-link to="/">Home</router-link>
           </li>
           <li v-if="isAuth" class="nav-item">
-            <router-link to="/bidList">My bids</router-link>
+            <router-link to="/bidList">My current bids</router-link>
           </li>
           <li v-if="isAuth" class="nav-item">
             <router-link to="/myAuctions">My auctions</router-link>
+          </li>
+          <li v-if="isAuth" class="nav-item">
+            <router-link to="/myHistory">My History</router-link>
           </li>
           <li v-if="isAuth" class="nav-item">
             <router-link to="/newAuction">New auction</router-link>
@@ -18,11 +21,9 @@
           <li v-if="isAuth" class="nav-item">
             <router-link to="/messenger">Messenger</router-link>
           </li>
-          <!-- on the right side -->
           <li v-if="isAuth" class="nav-item">
             <a @click="logout()">Log out</a>
           </li>
-          <!-- <div v-else></div> -->
           <li v-if="!isAuth" class="nav-item">
             <router-link to="/login">Log in</router-link>
           </li>

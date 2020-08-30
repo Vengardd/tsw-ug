@@ -9,6 +9,7 @@ import Navbar from "../components/Navbar.vue";
 import AuctionNew from "../components/AuctionNew.vue";
 import AuctionWithBids from "../components/AuctionWithBids.vue";
 import AuctionBidList from "../components/AuctionBidList";
+import AuctionHistoryList from "../components/AuctionHistoryList";
 import store from "../store";
 
 Vue.use(VueRouter);
@@ -33,6 +34,14 @@ const routes = [
         path: "/myAuctions",
         name: "MyAuctions",
         component: AuctionOwnList,
+        meta: {
+            requiresAuth: true
+        }
+    },
+    {
+        path: "/myHistory",
+        name: "MyHistory",
+        component: AuctionHistoryList,
         meta: {
             requiresAuth: true
         }

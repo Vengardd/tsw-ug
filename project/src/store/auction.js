@@ -1,6 +1,5 @@
 import axios from "axios";
 import auth from "../store/auth";
-// import router from "../router";
 
 const state = {
     auctions: [],
@@ -35,6 +34,13 @@ const actions = {
             .then(res => {
                 commit("startPage", res.data);
             });
+    },
+    loadHistoryAuctions ({ commit }) {
+        return axios.get("http://localhost:5000/api/auctions/history", { withCredentials: true })
+            .then(res => {
+                commit("startPage", res.data);
+            }
+            );
     },
     resetAuctions () {
         state.actualSite = 0;

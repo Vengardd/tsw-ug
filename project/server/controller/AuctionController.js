@@ -10,10 +10,13 @@ router.route("/auction/:id")
     .get(auctionService.getAuction);
 
 router.route("/auctions/byUser")
-    .get(isLoggedIn, auctionService.getAllAuctionsByUser);
+    .get(isLoggedIn, auctionService.getAllUserAuctions);
 
 router.route("/auctions/ownBids")
-    .get(isLoggedIn, auctionService.getAllAuctionsOwnBids);
+    .get(isLoggedIn, auctionService.getCurrentBiddedAuctions);
+
+router.route("/auctions/history")
+    .get(isLoggedIn, auctionService.getAllHistoryAuctions);
 
 router.route("/auction/addOrUpdate")
     .post(isLoggedIn, auctionService.addOrUpdateAuction);
