@@ -13,8 +13,6 @@ const actions = {
         state.socket.emit("messages", receiver);
     },
     emitMessage ({ state }, { eventName, data }) {
-        console.log(eventName);
-        console.log(data);
         state.socket.emit(eventName, data);
     }
 };

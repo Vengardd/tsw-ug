@@ -23,8 +23,8 @@ export default {
         Auction
     },
     methods: {
-        loadNewAuctions () {
-            this.$store.dispatch("loadNewAuctions");
+        async loadNewAuctions () {
+            await this.$store.dispatch("loadNewAuctions");
             this.auctions = this.$store.getters.auctions;
         }
     },

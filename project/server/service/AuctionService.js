@@ -4,7 +4,7 @@ const User = require("../model/user");
 const AuctionProcess = require("../model/auctionprocess");
 const mongoose = require("mongoose");
 
-const limitAuctionOnPage = 12;
+const limitAuctionOnPage = 3;
 
 exports.getAllAuctions = async (req, res) => {
     const page = req.query.page;
@@ -64,22 +64,23 @@ exports.addOrUpdateAuction = async (req, res) => {
     }
     delete auction.isBuyNow;
     if (req.user.id === auction.sellerUserId !== undefined) {
-        if (auction._id !== undefined) {
-            if (!auction.startDate) {
-                console.log("actualise");
-                await Auction.updateOne({ _id: auction._id }, { $set: auction });
-                res.status(201).send(auction);
-                return auction;
-            }
-        } else {
-            console.log("new");
-            auction.sellerUserId = req.user.id;
-            const newAuction = new Auction(auction);
-            newAuction.save();
-            res.status(201);
-            return newAuction;
-        }
+        res.status(400);
     }
+    if (auction._id !== undefined) {
+        if (auction.startDate) {
+            res.send(400);
+        }
+        console.log("actualise");
+        await Auction.updateOne({ _id: auction._id }, { $set: auction });
+        res.status(201).send(auction);
+        return auction;
+    }
+    console.log("new");
+    auction.sellerUserId = req.user.id;
+    const newAuction = new Auction(auction);
+    newAuction.save();
+    res.status(201);
+    return newAuction;
 };
 
 exports.startAuction = async (req, res) => {
@@ -101,11 +102,16 @@ exports.startAuction = async (req, res) => {
 exports.buyNow = async (req, res) => {
     const id = req.user.id;
     const auctionId = req.params.id;
+    const oldAuction = await Auction.findOne({ _id: auctionId });
+    if (id === oldAuction.sellerUserId) {
+        res.status(400).end();
+    }
     const newFields = {
         buyDate: new Date(),
         buyerUserId: id
     };
-    return await Auction.findOneAndUpdate({ _id: auctionId }, newFields);
+    const actualisedAuction = await Auction.findOneAndUpdate({ _id: auctionId }, newFields, { new: true });
+    res.status(200).send(actualisedAuction);
 };
 
 exports.getBids = async (req, res) => {

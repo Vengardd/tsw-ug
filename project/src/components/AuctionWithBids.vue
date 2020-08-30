@@ -49,10 +49,8 @@ export default {
     methods: {
         ...mapActions(["emitMessage"]),
         loadBids: function () {
-            console.log("Get messages rest");
             axios.get("http://localhost:5000/api/bids" + "?id=" + this.auction._id, { withCredentials: true })
                 .then(res => {
-                    console.log(res.data);
                     this.bids = res.data;
                 }
                 )
@@ -80,7 +78,7 @@ export default {
                 if (data.auctionId === this.auction._id) {
                     this.bids.push(data);
                     console.log(this.bids);
-                    this.auction.actualPrice = data.actualPrice;
+                    this.auction.actualPrice = data.price;
                 }
             });
             this.socket.on("endOfAuction", (auctionId) => {

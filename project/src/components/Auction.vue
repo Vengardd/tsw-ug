@@ -106,9 +106,7 @@ export default {
         buyNow () {
             axios.get(`http://localhost:5000/api/auction/buyNow/${this.auction._id}`, { withCredentials: true })
                 .then(res => {
-                    console.log(this.auction);
-                    console.log(res.data);
-                    this.auction = res.data;
+                    this.$set(this, "auction", res.data);
                 });
         },
         goToBids () {
@@ -131,19 +129,6 @@ export default {
                     }
                 });
             }
-        },
-        bidSockets: function () {
-            this.socket.on("newBid", (data) => {
-                if (data.auctionId === this.auction._id) {
-                    this.auction.actualPrice = data.actualPrice;
-                    this.bid = this.auction.actualPrice + 1;
-                }
-            });
-            this.socket.on("endOfAuction", (auctionId) => {
-                if (auctionId === this.auction._id) {
-                    this.auction.buyDate = this.auction.endDate;
-                };
-            });
         }
     },
     created () {

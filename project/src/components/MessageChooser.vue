@@ -38,6 +38,7 @@ export default {
         ...mapActions(["emitMessage", "getMessages"]),
         getMessagesRest: function () {
             console.log("Get messages rest");
+            console.log(this.username);
             axios.get("http://localhost:5000/api/messages" + "?receiver=" + this.receiver, { withCredentials: true })
                 .then(res => {
                     this.showMessages = true;
@@ -50,6 +51,7 @@ export default {
         },
         sendMessage: function () {
             console.log("Send message");
+            console.log(this.username);
             this.emitMessage({
                 eventName: "sendMessage",
                 data: {

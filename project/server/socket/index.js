@@ -16,9 +16,7 @@ const setup = (socketIo) => {
             if (auction.endDate > new Date()) {
                 const newBid = new Bid(data);
                 await newBid.save();
-                console.log(newBid);
                 await Auction.updateOne({ _id: data.auctionId }, { $set: { actualPrice: newBid.price } });
-                console.log("złapano nowy bid aaaaaa");
                 clientSocket.broadcast.emit("newBid", newBid);
             } else {
                 const bids = await AuctionProcess.find({ auctionId: auction._id })
@@ -35,8 +33,9 @@ const setup = (socketIo) => {
         });
 
         clientSocket.on("sendMessage", data => {
-            console.log("a2");
-            console.log(data.message);
+            console.log(data.receiver);
+            console.log(clientSocket.request.user);
+            console.log();
             const receiver = connectedClients[data.receiver];
             if (receiver) {
                 console.log("isExistingReceiver");
