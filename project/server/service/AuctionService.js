@@ -47,11 +47,25 @@ exports.getAllAuctionsByUser = async (req, res) => {
 };
 
 exports.getAllAuctionsOwnBids = async (req, res) => {
-    const auctionsFromBids = await AuctionProcess.find({ bidder: req.user.username }).map(bid => bid.auctionId);
-    if (auctionsFromBids) {
-        const auctions = await (await Auction.find({})).filter(auction => auctionsFromBids.includes(auction._id));
+    const auctionIdsFromBids = await AuctionProcess.find({ bidder: req.user.username })
+        .distinct("auctionId");
+    if (auctionIdsFromBids) {
+        // const auctions = await Auction.find()
+        //     .where('_id').in(auctionIdsFromBids)
+        //     .exec();
+        const auctions = await Auction.find({
+            "endDate": {
+                "$gt": new Date()
+            },
+            "_id": {
+                "$in": auctionIdsFromBids
+            }
+        })
+            .exec();
+        console.log(auctions);
         res.send(auctions);
     }
+    res.status(200);
 };
 
 exports.addOrUpdateAuction = async (req, res) => {

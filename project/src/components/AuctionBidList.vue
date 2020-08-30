@@ -22,6 +22,7 @@ export default {
         Auction
     },
     async created () {
+        this.$store.dispatch("resetAuctions");
         await this.$store.dispatch("loadAllBidAuctions");
         this.auctions = this.$store.getters.auctions;
     }

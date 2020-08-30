@@ -23,7 +23,6 @@ const actions = {
             );
     },
     loadOwnNextAuctions ({ commit }) {
-        // console.log("USER ID: " + this.$store.getters.id);
         const id = auth.getters.id;
         return axios.get("http://localhost:5000/api/auctions/byUser" + "?id=" + id, { withCredentials: true })
             .then(res => {
