@@ -4,6 +4,7 @@ const serveStatic = require("serve-static");
 const userController = require("./controller/UserController");
 const auctionController = require("./controller/AuctionController");
 const messageController = require("./controller/MessageController");
+const auctionRestController = require("./rest/AuctionRestController");
 const mongus = require("./mongoose");
 const express = require("express");
 const cookieParser = require("cookie-parser");
@@ -41,6 +42,8 @@ app.use(passport.session());
 app.use("/api", userController);
 app.use("/api", auctionController);
 app.use("/api", messageController);
+
+app.use("/rest/api", auctionRestController);
 
 app.get("/", function (req, res) {
     res.send("Hello World!");

@@ -4,7 +4,7 @@ const User = require("../model/user");
 const AuctionProcess = require("../model/auctionprocess");
 const mongoose = require("mongoose");
 
-const limitAuctionOnPage = 3;
+const limitAuctionOnPage = 10;
 
 exports.getAllAuctions = async (req, res) => {
     const page = req.query.page;
@@ -97,8 +97,7 @@ exports.addOrUpdateAuction = async (req, res) => {
     auction.sellerUserId = req.user.id;
     const newAuction = new Auction(auction);
     newAuction.save();
-    res.status(201);
-    return newAuction;
+    res.status(201).send(newAuction);
 };
 
 exports.startAuction = async (req, res) => {
