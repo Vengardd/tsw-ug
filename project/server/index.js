@@ -5,6 +5,7 @@ const userController = require("./controller/UserController");
 const auctionController = require("./controller/AuctionController");
 const messageController = require("./controller/MessageController");
 const auctionRestController = require("./rest/AuctionRestController");
+const bidRestController = require("./rest/BidRestController");
 const mongus = require("./mongoose");
 const express = require("express");
 const cookieParser = require("cookie-parser");
@@ -44,6 +45,7 @@ app.use("/api", auctionController);
 app.use("/api", messageController);
 
 app.use("/rest/api", auctionRestController);
+app.use("/rest/api", bidRestController);
 
 app.get("/", function (req, res) {
     res.send("Hello World!");
@@ -64,6 +66,8 @@ io.use(passportSocketIo.authorize({
     passport: passport,
     cookieParser: cookieParser
 }));
+
+console.log(io);
 
 require("./socket")(io);
 

@@ -9,9 +9,12 @@ const connectedClients = {};
 const setup = (socketIo) => {
     socketIo.on("connection", clientSocket => {
         connectedClients[clientSocket.request.user.username] = clientSocket;
+        console.log(connectedClients);
+        console.log(clientSocket);
         checkForMessages(clientSocket.request.user.username, clientSocket);
         clientSocket.on("bid", async data => {
             console.log("BID");
+            console.log("BIDBIDDBID?");
             const auction = await Auction.findById({ _id: data.auctionId });
             if (auction.endDate > new Date()) {
                 const newBid = new Bid(data);
