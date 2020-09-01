@@ -52,18 +52,18 @@ app.get("/", function (req, res) {
 const httpPort = process.env.PORT || 5000;
 const httpsPort = process.env.PORT || 443;
 console.log(httpsPort);
-const server = app.listen(httpPort);
-// const server = require("./https")(app).listen(httpsPort);
+// const server = app.listen(httpPort);
+const server = require("./https")(app).listen(httpsPort);
 
 const passportSocketIo = require("passport.socketio");
 const io = require("socket.io")(server);
-// io.use(passportSocketIo.authorize({
-//     key: "connect.sid",
-//     secret: "SECRET",
-//     store: mongoStore,
-//     passport: passport,
-//     cookieParser: cookieParser
-// }));
+io.use(passportSocketIo.authorize({
+    key: "connect.sid",
+    secret: "SECRET",
+    store: mongoStore,
+    passport: passport,
+    cookieParser: cookieParser
+}));
 
 require("./socket")(io);
 
