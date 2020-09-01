@@ -15,7 +15,7 @@ const setup = (io) => {
                 auctionId: req.body.auctionId,
                 price: req.body.price,
                 date: new Date(),
-                bidder: req.user.id
+                bidder: req.user.username
             };
             const auction = await Auction.findById({ _id: data.auctionId });
             if (auction.endDate > new Date()) {
