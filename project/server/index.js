@@ -5,7 +5,6 @@ const userController = require("./controller/UserController");
 const auctionController = require("./controller/AuctionController");
 const messageController = require("./controller/MessageController");
 const auctionRestController = require("./rest/AuctionRestController");
-const bidRestController = require("./rest/BidRestController");
 const mongus = require("./mongoose");
 const express = require("express");
 const cookieParser = require("cookie-parser");
@@ -45,7 +44,6 @@ app.use("/api", auctionController);
 app.use("/api", messageController);
 
 app.use("/rest/api", auctionRestController);
-app.use("/rest/api", bidRestController);
 
 app.get("/", function (req, res) {
     res.send("Hello World!");
@@ -59,17 +57,21 @@ const server = app.listen(httpPort);
 
 const passportSocketIo = require("passport.socketio");
 const io = require("socket.io")(server);
-io.use(passportSocketIo.authorize({
-    key: "connect.sid",
-    secret: "SECRET",
-    store: mongoStore,
-    passport: passport,
-    cookieParser: cookieParser
-}));
-
-console.log(io);
+// io.use(passportSocketIo.authorize({
+//     key: "connect.sid",
+//     secret: "SECRET",
+//     store: mongoStore,
+//     passport: passport,
+//     cookieParser: cookieParser
+// }));
 
 require("./socket")(io);
+
+const bidRestController = require("./rest/BidRestController")(io);
+app.use("/rest/api", bidRestController);
+
+// var routes = require("./rest/BidTestRestController");
+// routes(app, io);
 
 app.use((req, res) => {
     res.status(404).json({

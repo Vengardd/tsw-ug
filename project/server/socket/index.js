@@ -8,10 +8,8 @@ const connectedClients = {};
 
 const setup = (socketIo) => {
     socketIo.on("connection", clientSocket => {
-        connectedClients[clientSocket.request.user.username] = clientSocket;
-        console.log(connectedClients);
-        console.log(clientSocket);
-        checkForMessages(clientSocket.request.user.username, clientSocket);
+        // connectedClients[clientSocket.request.user.username] = clientSocket;
+        // checkForMessages(clientSocket.request.user.username, clientSocket);
         clientSocket.on("bid", async data => {
             console.log("BID");
             console.log("BIDBIDDBID?");
@@ -75,9 +73,9 @@ const setup = (socketIo) => {
                 });
             }
         });
-        clientSocket.on("disconnect", () => {
-            delete connectedClients[clientSocket.request.user.username];
-        });
+        // clientSocket.on("disconnect", () => {
+        //     delete connectedClients[clientSocket.request.user.username];
+        // });
     });
 };
 

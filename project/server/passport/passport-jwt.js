@@ -9,7 +9,6 @@ opts.secretOrKey = "SECRET_JWT";
 
 module.exports = (passport) => {
     passport.use(new JwtStrategy(opts, function (jwtPayload, done) {
-        console.log("ASDASD");
         User.findById(jwtPayload.id, function (err, user) {
             if (err) {
                 return done(err, false);
