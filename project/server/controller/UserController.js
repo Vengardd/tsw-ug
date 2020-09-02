@@ -19,4 +19,7 @@ router.route("/login")
 router.route("/register")
     .post(userService.registerUser);
 
+router.route("/allUsernames")
+    .get(userService.getAllUsernames);
+
 module.exports = router;

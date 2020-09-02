@@ -73,7 +73,6 @@ exports.getCurrentBiddedAuctions = async (req, res) => {
 };
 
 exports.addOrUpdateAuction = async (req, res) => {
-    console.log("WCHODZI TU");
     const auction = req.body;
     if (auction.isBuyNow) {
         auction.type = "BUY";
@@ -93,7 +92,6 @@ exports.addOrUpdateAuction = async (req, res) => {
         res.status(201).send(auction);
         return auction;
     }
-    console.log("new");
     auction.sellerUserId = req.user.id;
     const newAuction = new Auction(auction);
     newAuction.save();
@@ -102,11 +100,11 @@ exports.addOrUpdateAuction = async (req, res) => {
 
 exports.startAuction = async (req, res) => {
     const id = req.query.id;
-    // const auction = await Auction.findOne({ _id: id });
+    const auction = await Auction.findOne({ _id: id });
     const newStartDate = new Date();
-    const newEndDate = new Date(newStartDate.getTime() + 909090909 * 1000);
-    // newEndDate.setTime(newStartDate.getTime() + (auction.duration * 60 * 1000));
-    console.log(newStartDate);
+    const newEndDate = new Date();
+    newEndDate.setTime(newStartDate.getTime() + (auction.duration * 60 * 1000));
+    console.log(newEndDate);
     const newFields = {
         startDate: newStartDate,
         endDate: newEndDate

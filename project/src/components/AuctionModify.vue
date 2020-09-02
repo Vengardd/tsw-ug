@@ -35,7 +35,7 @@ export default {
     props: ["oldAuction"],
     methods: {
         onSubmit: function () {
-            // axios.post(`http://localhost:5000/api/auction/addOrUpdate`, this.auction, { withCredentials: true })
+            // axios.post(`${location.origin}/api/auction/addOrUpdate`, this.auction, { withCredentials: true })
             // .then(() => window.location.reload());
         }
     },

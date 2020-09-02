@@ -18,7 +18,7 @@ const mongoStore = new MongoStore({ mongooseConnection: mongoose.connection });
 
 const app = express();
 
-app.use(cors({ credentials: true, origin: "http://localhost:5001" }));
+app.use(cors({ credentials: true, origin: "http://localhost:5000" }));
 
 app.use(express.json());
 app.use(cookieParser());
@@ -35,9 +35,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(passport.initialize());
 app.use(passport.session());
 
-// app.use(serveStatic(path.join(__dirname, "./public")));
-
-// app.get(/.*/, (req, res) => res.sendFile(path.join(__dirname, "/public/index.html")));
+app.use(serveStatic(path.join(__dirname, "./public")));
 
 app.use("/api", userController);
 app.use("/api", auctionController);
@@ -66,6 +64,7 @@ io.use(passportSocketIo.authorize({
 }));
 
 require("./socket")(io);
+require("./job")(io);
 
 const bidRestController = require("./rest/BidRestController")(io);
 app.use("/rest/api", bidRestController);

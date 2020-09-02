@@ -1,6 +1,12 @@
 <template>
     <div class="messenger">
         <input v-model="receiver" name="receiver" type="text" id="receiver">
+        <select v-model="receiver">
+        <option v-for="username in usernames" v-bind:key="username._id">
+            {{ username.username }}
+        </option>
+        </select>
+        <span>Selected: {{ selected }}</span>
         <button @click="getMessagesRest">Load Messages</button>
         <div v-if="showMessages">
              <li v-for="message in messages" :key="message._id">
@@ -28,7 +34,8 @@ export default {
             message: "",
             receiver: "",
             showMessages: false,
-            socket: io("http://localhost:5000")
+            socket: io(`${location.origin}`),
+            usernames: ""
         };
     },
     computed: {
@@ -39,7 +46,7 @@ export default {
         getMessagesRest: function () {
             console.log("Get messages rest");
             console.log(this.username);
-            axios.get("http://localhost:5000/api/messages" + "?receiver=" + this.receiver, { withCredentials: true })
+            axios.get(`${location.origin}/api/messages` + "?receiver=" + this.receiver + "&sender=" + this.username, { withCredentials: true })
                 .then(res => {
                     this.showMessages = true;
                     this.messages = res.data;
@@ -56,20 +63,30 @@ export default {
                 eventName: "sendMessage",
                 data: {
                     receiver: this.receiver,
+                    sender: this.username,
                     message: this.message
                 }
             });
         },
         bidSockets: function () {
             this.socket.on("message", (data) => {
+                console.log(data);
                 if (data.receiver === this.username || data.sender === this.username) {
                     this.messages.push(data);
                 }
             });
+        },
+        getUsernames: function () {
+            axios.get(`${location.origin}/api/allUsernames`)
+                .then(res => {
+                    this.usernames = res.data;
+                    console.log(this.usernames);
+                });
         }
     },
     mounted () {
         this.bidSockets();
+        this.getUsernames();
     }
 };
 </script>

@@ -39,7 +39,7 @@ export default {
         return {
             bid: 0,
             bids: [],
-            socket: io("http://localhost:5000")
+            socket: io(`${location.origin}`)
         };
     },
     computed: {
@@ -49,7 +49,7 @@ export default {
     methods: {
         ...mapActions(["emitMessage"]),
         loadBids: function () {
-            axios.get("http://localhost:5000/api/bids" + "?id=" + this.auction._id, { withCredentials: true })
+            axios.get(`${location.origin}/api/bids` + "?id=" + this.auction._id, { withCredentials: true })
                 .then(res => {
                     this.bids = res.data;
                 }

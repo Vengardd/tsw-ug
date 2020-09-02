@@ -23,7 +23,14 @@ const registerUser = async (req, res) => {
     }
     return res.status(201).json(await addUser(req.body.username, req.body.password));
 };
+
+const getAllUsernames = async (req, res) => {
+    const usernames = await User.find().select('username');
+    res.status(200).json(usernames);
+};
+
 module.exports = {
     addUser,
-    registerUser
+    registerUser,
+    getAllUsernames
 };

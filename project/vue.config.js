@@ -4,12 +4,12 @@ module.exports = {
     outputDir: path.resolve(__dirname, "./server/public"),
     configureWebpack: {
         devtool: "source-map"
+    },
+    devServer: {
+        proxy: {
+            "/api": {
+                target: "https://localhost:5000"
+            }
+        }
     }
-    // devServer: {
-    // proxy: {
-    //     "/api": {
-    //         target: "https://localhost:443"
-    //     }
-    // }
-    // }
 };

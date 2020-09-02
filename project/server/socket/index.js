@@ -8,17 +8,19 @@ const connectedClients = {};
 
 const setup = (socketIo) => {
     socketIo.on("connection", clientSocket => {
-        // connectedClients[clientSocket.request.user.username] = clientSocket;
-        // checkForMessages(clientSocket.request.user.username, clientSocket);
+        connectedClients[clientSocket.request.user.username] = clientSocket;
+        checkForMessages(clientSocket.request.user.username, clientSocket);
         clientSocket.on("bid", async data => {
             console.log("BID");
             console.log("BIDBIDDBID?");
             const auction = await Auction.findById({ _id: data.auctionId });
             if (auction.endDate > new Date()) {
-                const newBid = new Bid(data);
-                await newBid.save();
-                await Auction.updateOne({ _id: data.auctionId }, { $set: { actualPrice: newBid.price } });
-                clientSocket.broadcast.emit("newBid", newBid);
+                if (data.price > auction.actualPrice) {
+                    const newBid = new Bid(data);
+                    await newBid.save();
+                    await Auction.updateOne({ _id: data.auctionId }, { $set: { actualPrice: newBid.price } });
+                    clientSocket.broadcast.emit("newBid", newBid);
+                }
             } else {
                 const bids = await AuctionProcess.find({ auctionId: auction._id })
                     .sort("price");
@@ -34,9 +36,7 @@ const setup = (socketIo) => {
         });
 
         clientSocket.on("sendMessage", data => {
-            console.log(data.receiver);
-            console.log(clientSocket.request.user);
-            console.log();
+            const sender = data.sender;
             const receiver = connectedClients[data.receiver];
             if (receiver) {
                 console.log("isExistingReceiver");
@@ -44,7 +44,7 @@ const setup = (socketIo) => {
                     message: data.message,
                     date: new Date(),
                     receiver: data.receiver,
-                    sender: clientSocket.request.user.username,
+                    sender: sender,
                     delivered: true
                 });
                 newMessage.save();
@@ -52,7 +52,7 @@ const setup = (socketIo) => {
                     _id: newMessage._id,
                     message: data.message,
                     receiver: data.receiver,
-                    sender: clientSocket.request.user.username
+                    sender: sender
                 });
             } else {
                 console.log("receiverNotExisting");
@@ -61,7 +61,7 @@ const setup = (socketIo) => {
                     message: data.message,
                     date: new Date(),
                     receiver: data.receiver,
-                    sender: clientSocket.request.user.username,
+                    sender: sender,
                     delivered: false
                 });
                 newMessage.save();
@@ -69,10 +69,11 @@ const setup = (socketIo) => {
                     _id: newMessage._id,
                     message: data.message,
                     receiver: data.receiver,
-                    sender: clientSocket.request.user.username
+                    sender: sender
                 });
             }
         });
+
         // clientSocket.on("disconnect", () => {
         //     delete connectedClients[clientSocket.request.user.username];
         // });

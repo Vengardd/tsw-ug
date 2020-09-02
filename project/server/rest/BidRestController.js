@@ -19,10 +19,12 @@ const setup = (io) => {
             };
             const auction = await Auction.findById({ _id: data.auctionId });
             if (auction.endDate > new Date()) {
-                const newBid = new Bid(data);
-                await newBid.save();
-                await Auction.updateOne({ _id: data.auctionId }, { $set: { actualPrice: newBid.price } });
-                io.emit("newBid", newBid);
+                if (data.price > auction.actualPrice) {
+                    const newBid = new Bid(data);
+                    await newBid.save();
+                    await Auction.updateOne({ _id: data.auctionId }, { $set: { actualPrice: newBid.price } });
+                    io.emit("newBid", newBid);
+                }
             } else {
                 const bids = await Bid.find({ auctionId: auction._id })
                     .sort("price");

@@ -10,7 +10,7 @@ axios.create({
     withCredentials: true,
     headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "http://localhost:5000",
+        "Access-Control-Allow-Origin": `${location.origin}`,
         "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE"
     }
 });

@@ -64,7 +64,7 @@ export default {
     data () {
         return {
             bid: this.auction.actualPrice + 1,
-            socket: io("http://localhost:5000"),
+            socket: io(`${location.origin}`),
             newAuction: {
                 title: "",
                 description: "",
@@ -87,7 +87,7 @@ export default {
             return this.auction.sellerUserId === this.$store.getters.id;
         },
         modifyAuction: function () {
-            axios.post("http://localhost:5000/api/auction/addOrUpdate", this.newAuction, { withCredentials: true })
+            axios.post(`${location.origin}/api/auction/addOrUpdate`, this.newAuction, { withCredentials: true })
                 .then((res) => {
                     this.$set(this, "auction", res.data);
                     console.log(res);
@@ -95,16 +95,15 @@ export default {
                 );
         },
         startAuction () {
-            axios.get(`http://localhost:5000/api/startAuction?id=${this.auction._id}`, { withCredentials: true })
+            axios.get(`${location.origin}/api/startAuction?id=${this.auction._id}`, { withCredentials: true })
                 .then(res => {
-                    this.$set(this.auction, "startDate", res.data.startDate);
-                    this.auction.startDate = res.data.startDate;
+                    this.$set(this, "auction", res.data);
                     console.log(this.auction);
                     console.log(res.data);
                 });
         },
         buyNow () {
-            axios.get(`http://localhost:5000/api/auction/buyNow/${this.auction._id}`, { withCredentials: true })
+            axios.get(`${location.origin}/api/auction/buyNow/${this.auction._id}`, { withCredentials: true })
                 .then(res => {
                     this.$set(this, "auction", res.data);
                 });
