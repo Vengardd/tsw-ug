@@ -133,12 +133,12 @@ export default {
     created () {
         this.socket.on("newBid", (data) => {
             if (data.auctionId === this.auction._id) {
-                console.log(data);
                 this.auction.actualPrice = data.price;
             }
         });
         this.socket.on("endOfAuction", (auctionId) => {
             if (auctionId === this.auction._id) {
+                this.$set(this.auction, "buyDate", this.auction.endDate);
                 this.auction.buyDate = this.auction.endDate;
             };
         });
