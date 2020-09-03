@@ -1,0 +1,6 @@
+Wypuszczenie aplikacji w ngroku:
+1. Instalacja, autentykacja ngroka w folderze /server
+2. Odpalenie go komendą ./ngrok http https://localhost:5000 -host-header="localhost:5000"
+3. Zmiana w froncie URLów z podanych na sztywno na ${location.origin}
+4. Zbuildować front(npm run build)
+5. 
