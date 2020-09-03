@@ -37,7 +37,7 @@ export default {
         onSubmit: function () {
             axios.post(`${location.origin}/api/auction/addOrUpdate`, this.auction, { withCredentials: true });
             console.log("added new auction");
-            router.push("/");
+            router.push("/myAuctions");
         }
     }
 };

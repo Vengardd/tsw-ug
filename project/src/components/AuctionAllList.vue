@@ -40,7 +40,7 @@ export default {
 div{
   ul{
     display: flex;
-    flex-wrap:wrap;
+    flex-wrap: wrap;
    list-style: none;
   }
   li{

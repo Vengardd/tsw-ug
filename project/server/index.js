@@ -5,6 +5,7 @@ const userController = require("./controller/UserController");
 const auctionController = require("./controller/AuctionController");
 const messageController = require("./controller/MessageController");
 const auctionRestController = require("./rest/AuctionRestController");
+const userRestController = require("./rest/UserRestController");
 const mongus = require("./mongoose");
 const express = require("express");
 const cookieParser = require("cookie-parser");
@@ -42,6 +43,7 @@ app.use("/api", auctionController);
 app.use("/api", messageController);
 
 app.use("/rest/api", auctionRestController);
+app.use("/rest/api", userRestController);
 
 app.get("/", function (req, res) {
     res.send("Hello World!");

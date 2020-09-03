@@ -13,7 +13,7 @@
         Start Date: {{auction.startDate}} <br>
         End Date: {{auction.endDate}} <br>
         Buy Date: {{auction.buyDate}} <br>
-        Duration: {{auction.duration}} <br>
+        Duration(In minutes): {{auction.duration}} <br>
         Actual Price: {{auction.actualPrice}} <br>
     </div>
     <div v-if="!auction.startDate && checkIfAuctionIsForUser()">
@@ -25,10 +25,10 @@
             <input v-model="newAuction.title" type="text" name="title" id="title" minLength="3" required="" /> <br>
             <label> description  </label>
             <input v-model="newAuction.description" type="text" name="description" id="description" minLength="3" required="" /> <br>
-            <label> duration  </label>
-            <input v-model="newAuction.duration" type="number" name="duration" id="duration" required="" /> <br>
+            <label> duration (in minutes)  </label>
+            <input v-model="newAuction.duration" type="number" name="duration" id="duration" required="" min="1"/> <br>
             <label> actual price  </label>
-            <input v-model="newAuction.actualPrice" type="number" name="actualPrice" id="actualPrice" required="" /> <br>
+            <input v-model="newAuction.actualPrice" type="number" name="actualPrice" id="actualPrice" required="" min="1"/> <br>
             <label> is buy now  </label>
             <input v-model="newAuction.isBuyNow" type="checkbox" name="isBuyNow" id="isBuyNow" /> <br>
             <button type="submit">Apply changes</button>
@@ -68,8 +68,8 @@ export default {
             newAuction: {
                 title: "",
                 description: "",
-                duration: 0,
-                actualPrice: 0,
+                duration: 1,
+                actualPrice: 1,
                 isBuyNow: ""
             }
         };
@@ -156,9 +156,20 @@ export default {
 <style lang="scss" scoped>
 div{
   .container
-  {
-      display: flex;
+    {
+        display: flex;
         justify-content:center;
+        border-radius: 25px;
+        border: 2px solid black;
+        margin: 5px 5px 5px 5px;
+        padding: 10px;
     }
+  button
+  {
+      background-color: transparent;
+      border-radius: 25px;
+      margin: 5px 5px 5px 5px;
+      padding: 10px;
+  }
 }
 </style>

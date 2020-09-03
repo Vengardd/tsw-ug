@@ -1,5 +1,5 @@
 <template>
-    <div class="messenger">
+    <div class="container">
         <input v-model="receiver" name="receiver" type="text" id="receiver">
         <select v-model="receiver">
         <option v-for="username in usernames" v-bind:key="username._id">
@@ -9,10 +9,14 @@
         <span>Selected: {{ selected }}</span>
         <button @click="getMessagesRest">Load Messages</button>
         <div v-if="showMessages">
-             <li v-for="message in messages" :key="message._id">
-                 From: {{message.sender}} To: {{message.receiver}} <br>
-                 Message: {{message.message}}
-            </li>
+             <ul v-for="message in messages" :key="message._id" class="messages">
+                 <li class="ours" v-if="message.sender === username">
+                 {{message.message}}
+                 </li>
+                 <li v-if="message.sender !== username">
+                 {{message.message}}
+                 </li>
+            </ul>
             <form @submit.prevent="sendMessage">
                 <label>Message: </label>
                 <input v-model="message" name="message" type="text">
@@ -90,3 +94,33 @@ export default {
     }
 };
 </script>
+
+<style lang="scss" scoped>
+div{
+  .messages
+    {
+        display: flex;
+        flex-direction: column;
+        justify-items: center;
+        list-style-type: none;
+
+        // height: 300px;
+        width: 400px;
+    }
+    li{
+        align-self: flex-start;
+        list-style-type: none;
+        border-radius: 25px;
+        border-color: black;
+        background:#7fffbf;
+    }
+  li.ours
+  {
+      align-self: flex-end;
+      list-style-type: none;
+      border-radius: 25px;
+      border-color: blue;
+      background: #B9DEFF;
+  }
+}
+</style>

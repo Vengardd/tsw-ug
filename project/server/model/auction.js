@@ -11,7 +11,7 @@ const AuctionSchema = new Schema({
     duration: { type: Number },
     sellerUserId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     buyerUserId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-    actualPrice: { type: Number, required: true }
+    actualPrice: { type: Number }
 });
 
 const Auction = mongoose.model("Auction", AuctionSchema);

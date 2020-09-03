@@ -14,7 +14,7 @@ exports.getAllAuctions = async (req, res) => {
 };
 
 exports.getAuction = async (req, res) => {
-    console.log("get auction by id");
+    // console.log("get auction by id");
     const id = req.params.id;
     const auction = await Auction.findOne({ _id: id });
     res.send(auction);
@@ -24,7 +24,6 @@ exports.getAuction = async (req, res) => {
 exports.getAllUserAuctions = async (req, res) => {
     const id = req.user.id;
     const allAuctions = await Auction.find({ sellerUserId: id });
-    console.log(allAuctions);
     res.send(allAuctions);
 };
 
@@ -49,7 +48,7 @@ exports.getAllHistoryAuctions = async (req, res) => {
 
     const result = new Set(wonAuctions);
     participatedAuctions.forEach(a => result.add(a));
-    console.log(result);
+    // console.log(result);
     res.send(Array.from(result));
 };
 

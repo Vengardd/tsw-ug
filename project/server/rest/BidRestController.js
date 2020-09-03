@@ -10,7 +10,6 @@ require("../passport/passport-jwt")(passport);
 const setup = (io) => {
     router.route("/bids")
         .post(passport.authenticate("jwt", { session: false }), async (req, res) => {
-            console.log("BID REST");
             const data = {
                 auctionId: req.body.auctionId,
                 price: req.body.price,
@@ -33,7 +32,6 @@ const setup = (io) => {
                 await Auction.update({ _id: auction._id }, { buyerUserId: buyer._id, buyDate: new Date() });
                 io.emit("endOfAuction", auction._id);
             }
-            console.log("emitted");
             res.sendStatus(200);
         });
     return router;

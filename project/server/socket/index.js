@@ -2,7 +2,6 @@ const Message = require("../model/message");
 const Bid = require("../model/auctionprocess");
 const Auction = require("../model/auction");
 const User = require("../model/user");
-const AuctionProcess = require("../model/auctionprocess");
 
 const connectedClients = {};
 
@@ -12,7 +11,6 @@ const setup = (socketIo) => {
         checkForMessages(clientSocket.request.user.username, clientSocket);
         clientSocket.on("bid", async data => {
             console.log("BID");
-            console.log("BIDBIDDBID?");
             const auction = await Auction.findById({ _id: data.auctionId });
             if (auction.endDate > new Date()) {
                 if (data.price > auction.actualPrice) {
@@ -21,13 +19,6 @@ const setup = (socketIo) => {
                     await Auction.updateOne({ _id: data.auctionId }, { $set: { actualPrice: newBid.price } });
                     clientSocket.broadcast.emit("newBid", newBid);
                 }
-            } else {
-                const bids = await AuctionProcess.find({ auctionId: auction._id })
-                    .sort("price");
-                const buyerName = bids[0].bidder;
-                const buyer = await User.find({ username: buyerName });
-                await Auction.update({ _id: auction._id }, { buyerUserId: buyer._id, buyDate: new Date() });
-                clientSocket.broadcast.emit("endOfAuction", auction._id);
             }
         });
 
